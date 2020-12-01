@@ -19,6 +19,9 @@ Project to detect opening of a door using Raspberry Pi, magnetic strip sensor, a
     - When program is running, waits for reciept of a packet from the client.
     - On reciept, triggers a basic popup or notification on laptop that door has been opened
 
+**Note:** All client-side code will be written in a completely seperate directory than server-size.
+This is because the client-side code will need to be compiled and run without interaction from server-side.
+
 ## Experimental Setup
 
 - Sensor plugged into GPIO's of board
