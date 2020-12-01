@@ -38,10 +38,12 @@ class Server(Thread):
 
         # Wait for a connection
         while not self.thread_status.isSet():
-            data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-            print(f"received data {data} from address {addr}")
-            self._data_queue.put(data)
-            self._data_queue.put(addr)
+            raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+            data = raw_data.decode()
+            client_ip_addr, client_port = raw_addr
+
+            data_dict = {'data': data.strip(), 'client_ip': client_ip_addr, 'client_port': client_port}
+            self._data_queue.put(data_dict)
 
             self.thread_status.set()
 
@@ -63,7 +65,7 @@ class Server(Thread):
             ip_addr = socket.gethostbyname(hostname)
             return ip_addr
         else:
-            ip_reg_ex= r'inet ([^.]+.[^.]+.[^.]+.[^\s]+)'
+            ip_reg_ex= r'inet addr:([^.]+.[^.]+.[^.]+.[^\s]+)'
             ip_found = subprocess.check_output("ifconfig").decode()
             matches = re.findall(ip_reg_ex, ip_found)
 
@@ -104,3 +106,12 @@ class Server(Thread):
     @classmethod
     def set_port(cls, new_port):
         cls._udp_port = new_port
+
+    @classmethod
+    def translate_socket_dict(cls, data: dict) -> str:
+        """
+        Takes in a dictionary from the thread worker, and creates an explanatory string"""
+        msg = []
+        for key, val in data.items():
+            msg.append(f"{key}: {val}")
+        return '\n'.join(msg)

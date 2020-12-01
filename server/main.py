@@ -21,12 +21,11 @@ def wait_for_board(client_data: Queue) -> str:
     while True:
         # Only check queue if thread set - got a response from board
         if server.thread_status.is_set():
-            addr = client_data.get()
-            data = client_data.get()
+            socket_response_dict = client_data.get()
+            print(Server.translate_socket_dict(socket_response_dict))
             clear_queue(client_data)
 
-            print(f"Received data from board {data}")
-            return data
+            return socket_response_dict['data']
 
 if __name__ == "__main__":
     # Will store data, addr after recvfrom
@@ -41,3 +40,5 @@ if __name__ == "__main__":
 
         # TODO: make popup here
 
+# To test, run main and the following command in a terminal:
+# nc -u 192.168.1.220 52160
