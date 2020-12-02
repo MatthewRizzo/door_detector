@@ -29,12 +29,12 @@ class Server(Thread):
         """Handle the start of the thread and its waiting for communication
         \nOverload run function of Thread for this thread class. Gets called by start()."""
         # Setup the socket server
-        udp_ip = Server.get_cur_IP()
+        hostname, udp_ip = list(Server.get_cur_hostname_IP().values())
         sock = socket.socket(socket.AF_INET,  # Use the internet
                             socket.SOCK_DGRAM) # UDP
-
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((udp_ip, self._udp_port))
-        print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}")
+        print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
 
         # Wait for a connection
         while not self.thread_status.isSet():
@@ -58,22 +58,25 @@ class Server(Thread):
         return expected_platform == platform.system()
 
     @classmethod
-    def get_cur_IP(cls)->str:
+    def get_cur_hostname_IP(cls)->dict:
         """Return the IP address of your machine as seen by the router"""
         if(cls._platform_check(True)):
             hostname = socket.gethostname()
             ip_addr = socket.gethostbyname(hostname)
-            return ip_addr
+            return {'hostname' : hostname, 'ip' : ip_addr}
         else:
-            ip_reg_ex= r'inet addr:([^.]+.[^.]+.[^.]+.[^\s]+)'
-            ip_found = subprocess.check_output("ifconfig").decode()
-            matches = re.findall(ip_reg_ex, ip_found)
+            # ip_reg_ex= r'inet addr:([^.]+.[^.]+.[^.]+.[^\s]+)'
+            # ip_found = subprocess.check_output("ifconfig").decode()
+            # matches = re.findall(ip_reg_ex, ip_found)
 
-            # There might be many matches. Only one cared about starts with 192.168 (router perspective)
-            # https://qr.ae/pNs807
-            reduce_matches = lambda match: match.startswith("192.168.")
-            ip_addr =  list(filter(reduce_matches, matches))[0]
-            return ip_addr
+            # # There might be many matches. Only one cared about starts with 192.168 (router perspective)
+            # # https://qr.ae/pNs807
+            # reduce_matches = lambda match: match.startswith("192.168.")
+            # ip_addr =  list(filter(reduce_matches, matches))[0]
+            # return ip_addr
+            name = socket.gethostname()
+            ip_addr = socket.gethostbyname(name)
+            return {'hostname' : name, 'ip' : ip_addr}
 
     @classmethod
     def inform_board(cls):
@@ -82,9 +85,11 @@ class Server(Thread):
         Ignores responses.
         """
         # Send laptop's IP and port to the board
-        msg = cls.get_cur_IP()
-        multicast_group = (f"224.1.1.1 ACK {Server.get_port()}", 10000)
+        hostname, ip = list(cls.get_cur_hostname_IP().values())
+        multicast_group = ("224.1.1.1", 10000)
 
+        # give board hostname, ip, port
+        msg = f"{hostname}, {ip}, {Server.get_port()}"
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(.2)
 

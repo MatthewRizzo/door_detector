@@ -4,6 +4,7 @@
 """
 from queue import Queue
 from server import Server
+from notification import Notification
 
 udp_port = 52160
 
@@ -25,11 +26,16 @@ def wait_for_board(client_data: Queue) -> str:
             print(Server.translate_socket_dict(socket_response_dict))
             clear_queue(client_data)
 
+            server.join()
+            server = None
             return socket_response_dict['data']
+
 
 if __name__ == "__main__":
     # Will store data, addr after recvfrom
     client_data = Queue()
+
+    notif = Notification()
 
     # Send broadcast so board knows what server's IP and port are
     Server.inform_board()
@@ -38,7 +44,10 @@ if __name__ == "__main__":
     while True:
         data = wait_for_board(client_data)
 
-        # TODO: make popup here
+        # Alert user whenever it gets a msg
+        notif.alert()
+
 
 # To test, run main and the following command in a terminal:
 # nc -u 192.168.1.220 52160
+# nc -u MATT-ROG-LAPTOP 52160
