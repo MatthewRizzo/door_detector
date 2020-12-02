@@ -1,3 +1,5 @@
 # vs code related ignores
 .vscode/
 .env
+
+__pycache__/
