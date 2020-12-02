@@ -29,11 +29,14 @@ class Server(Thread):
         """Handle the start of the thread and its waiting for communication
         \nOverload run function of Thread for this thread class. Gets called by start()."""
         # Setup the socket server
-        hostname, udp_ip = list(Server.get_cur_hostname_IP().values())
+        data_dict = Server.get_cur_hostname_IP()
+        udp_ip = data_dict['ip']
+        hostname = data_dict['hostname']
         sock = socket.socket(socket.AF_INET,  # Use the internet
                             socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((udp_ip, self._udp_port))
+        # sock.bind((udp_ip, self._udp_port))
+        sock.bind((hostname, self._udp_port))
         print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
 
         # Wait for a connection
@@ -59,7 +62,8 @@ class Server(Thread):
 
     @classmethod
     def get_cur_hostname_IP(cls)->dict:
-        """Return the IP address of your machine as seen by the router"""
+        """Return the IP address of your machine as seen by the router
+        \n{'hostname' : hostname, 'ip' : ip_addr}"""
         if(cls._platform_check(True)):
             hostname = socket.gethostname()
             ip_addr = socket.gethostbyname(hostname)
@@ -85,7 +89,9 @@ class Server(Thread):
         Ignores responses.
         """
         # Send laptop's IP and port to the board
-        hostname, ip = list(cls.get_cur_hostname_IP().values())
+        data_dict = Server.get_cur_hostname_IP()
+        ip = data_dict['ip']
+        hostname = data_dict['hostname']
         multicast_group = ("224.1.1.1", 10000)
 
         # give board hostname, ip, port
