@@ -50,4 +50,4 @@ if __name__ == "__main__":
 
 # To test, run main and the following command in a terminal:
 # nc -u 192.168.1.220 52160
-# nc -u MATT-ROG-LAPTOP 52160
+# nc -u MATT-ROG-LAPTOP 52160 #TODO: get this to work with new hostname

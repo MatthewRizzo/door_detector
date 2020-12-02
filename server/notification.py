@@ -6,7 +6,6 @@ from tkinter import Tk, messagebox, Label
 # Project Includes
 import constants
 from server import Server
-from app_manager import AppManager
 
 class Notification():
     def __init__(self):
