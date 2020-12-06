@@ -35,8 +35,8 @@ class Server(Thread):
         sock = socket.socket(socket.AF_INET,  # Use the internet
                             socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # sock.bind((udp_ip, self._udp_port))
-        sock.bind((hostname, self._udp_port))
+        sock.bind((udp_ip, self._udp_port))
+        # sock.bind((hostname, self._udp_port))
         print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
 
         # Wait for a connection
@@ -79,7 +79,8 @@ class Server(Thread):
             # ip_addr =  list(filter(reduce_matches, matches))[0]
             # return ip_addr
             name = socket.gethostname()
-            ip_addr = socket.gethostbyname(name)
+            # Forces getting the local IP behind the NAT
+            ip_addr = subprocess.check_output("hostname -I", shell=True).decode().strip()
             return {'hostname' : name, 'ip' : ip_addr}
 
     @classmethod
