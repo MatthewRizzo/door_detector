@@ -1,8 +1,15 @@
-# vs code related ignores
+# C++ Related ignores
+# Cmake build folder
+*/build/
+# Cmake stores binaries here
+*/bin
+
+# Python related ignores
+__pycache__/
+
+# VS code related ignores
 .vscode/
 .env
-
-__pycache__/
 
 # Diagram / info related ignores
 info_files/*.png

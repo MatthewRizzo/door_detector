@@ -4,11 +4,11 @@ Project to detect opening of a door using Raspberry Pi, magnetic strip sensor, a
 
 ## Portions of Code
 
-1. Raspberry Pi Board GPIO Code (C) - client side
+1. Raspberry Pi Board GPIO Code (C++) - client side
     - Detects the door opening, using magentic strip sensor on door frame
     -
 
-2. Communication client(C)/server(python)
+2. Communication client(C++)/server(python)
     - server = another computer (probably my laptop)
     - Client = Raspberry Pi controlling the door sensor
     - when the RPi detect the door opening (using the sensor):

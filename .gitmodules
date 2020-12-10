@@ -1,0 +1,3 @@
+[submodule "board/extern/wiring_pi"]
+	path = board/extern/wiring_pi
+	url = git@github.com:WiringPi/WiringPi.git
