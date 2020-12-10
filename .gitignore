@@ -3,3 +3,7 @@
 .env
 
 __pycache__/
+
+# Diagram / info related ignores
+info_files/*.png
+info_files/~$*.docx
