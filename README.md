@@ -62,3 +62,12 @@ Folder structure
   - See info_files for circuit diagram
 - Sensor attached to door / door frame to detect opening
 - Other laptop is across the room, not connected by wire to board
+
+### Supplies
+
+- MC-38 Magnetic Switch Door Sensor from Gikfun
+- Raspberry Pi 3 running Raspian (debian based distribution)
+- Computer (running windows)
+- Resistors
+- Wires
+- Breadboard (for circuit)
