@@ -8,6 +8,7 @@
 
 // Project Includes
 #include "cli_controller.h"
+#include "client.h"
 #include "constants.h"
 
 using std::cerr;
@@ -17,6 +18,7 @@ using std::cout;
 int main(int argc, char* argv[])
 {
     //TODO: Startup client thread
+    Client client;
 
     //TODO: create GPIO object
     // led list will come from here
@@ -46,6 +48,10 @@ int main(int argc, char* argv[])
 
     //-------------- Initialize and Start --------------//
     cout << "parse_res = " << parse_res["led"] << endl;
+
+    // Client initialization and start
+    client.set_multicast_port(std::stoi(parse_res["b_port"]));
+    client.wait_for_multicast();
 
     return EXIT_SUCCESS;
 }

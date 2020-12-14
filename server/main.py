@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     notif = Notification()
 
-    # Send broadcast so board knows what server's IP and port are
+    # Send multicast so board knows what server's IP and port are
     Server.inform_board()
 
     # Constantly wait for a msg that the door has been opened from the board

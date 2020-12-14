@@ -52,6 +52,12 @@ void CLI_parser::setup_flags()
         ->delimiter(delim)
         ->check(CLI::IsMember(led_list))
         ->join(delim);
+
+    add_option("-bp,--multicast_port",
+            cli_results[CLI::ParseMetaData::MULTICAST_PORT])
+        ->description("Which port do you want to use for the Broadcast wait socket?")
+        ->required(false)
+        ->default_val(Comm::DEFAULT_MULTICAST_PORT);
 }
 
 }; // end of namespace

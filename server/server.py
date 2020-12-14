@@ -51,7 +51,7 @@ class Server(Thread):
             self.thread_status.set()
 
 
-    # Class methods to handle broadcasting / multicasting to Pi
+    # Class methods to handle multicasting / multicasting to Pi
     @classmethod
     def  _platform_check(cls, is_windows: bool = True) -> bool:
         """Utility function that checks what the platform is.
@@ -85,7 +85,7 @@ class Server(Thread):
 
     @classmethod
     def inform_board(cls):
-        """Function to ping board with a broadcast.
+        """Function to ping board with a multicast.
         \nGives the board this computer's IP and the port it is waiting on.
         Ignores responses.
         """
@@ -93,19 +93,20 @@ class Server(Thread):
         data_dict = Server.get_cur_hostname_IP()
         ip = data_dict['ip']
         hostname = data_dict['hostname']
-        multicast_group = ("224.1.1.1", 10000)
+        multicast_group = (constants.MULTICAST_GROUP_IP, constants.MULTI_CAST_PORT)
 
         # give board hostname, ip, port
         msg = f"{hostname}, {ip}, {Server.get_port()}"
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(.2)
 
-        # Ensure only LAN gets broadcast - set time-to-live to 1, cannot go past router
+        # Ensure only LAN gets multicast - set time-to-live to 1, cannot go past router
         ttl = struct.pack('b', 1)
+        # disable loopback, makes sure our datagrams from broadcast not received
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
         try:
-            print("Sending broadcast to LAN")
+            print("Sending multicast to LAN")
             sent = sock.sendto(msg.encode(), multicast_group)
             # Don't care about responses
         finally:
