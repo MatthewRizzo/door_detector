@@ -6,4 +6,5 @@
 
 # Can set using a static path because these are tagged by git and not version controlled
 SET(CLI11_FOUND True)
-SET(CLI11_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/CLI11/include/) # give relative path to include dir
+# message(STATUS "source dir ${CMAKE_CURRENT_SOURCE_DIR}")
+SET(CLI11_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/CLI11/include/CLI) # give relative path to include dir
