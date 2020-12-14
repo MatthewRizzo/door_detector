@@ -6,7 +6,7 @@ add_executable(main_driver
 
 # include created libs from other dirs -- comes after add executable
 target_link_libraries(main_driver
-    CLIENT
     CLI_CONTROLLER
     GPIO_Controller
+    NETWORK
 )

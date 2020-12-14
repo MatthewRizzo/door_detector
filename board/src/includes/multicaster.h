@@ -1,5 +1,5 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef MULTICASTER_H
+#define MULTICASTER_H
 
 // Standard Includes
 #include <arpa/inet.h> // used by inet_addr
@@ -10,10 +10,10 @@
 #include <unistd.h> // used by open/close
 
 
-class Client
+class Multicaster
 {
     public:
-        Client();
+        Multicaster();
 
         // API functions
         /**
@@ -31,6 +31,9 @@ class Client
          */
         bool wait_for_multicast();
     private:
+        //helper functions
+        bool set_multicast_opt(int multicast_fd) const;
+
         /**
          * @brief Get the public ip of the device
          * @credit https://stackoverflow.com/a/3120382/13933174 (with some modifications)
@@ -64,6 +67,6 @@ class Client
 
 
 
-}; // End of Client class
+}; // End of Multicaster class
 
 #endif

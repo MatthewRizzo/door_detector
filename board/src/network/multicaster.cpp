@@ -1,12 +1,12 @@
 // Project Includes
-#include "client.h"
+#include "multicaster.h"
 #include "constants.h"
 
 using std::cout;
 using std::endl;
 
 // Constructor
-Client::Client():
+Multicaster::Multicaster():
     server_ip(""),
     server_port(Comm::DEFAULT_SERVER_PORT),
     server_sock_fd(-1),
@@ -15,12 +15,12 @@ Client::Client():
 {
 }
 
-void Client::set_multicast_port(int port)
+void Multicaster::set_multicast_port(int port)
 {
     multicast_port = port;
 }
 
-bool Client::wait_for_multicast()
+bool Multicaster::wait_for_multicast()
 {
     //TODO: Make this shorter / break into smaller pieces
 
@@ -33,48 +33,7 @@ bool Client::wait_for_multicast()
     }
 
     // setup options - for multicast mode allow reuse
-    int option(1);
-    if(setsockopt(multicast_sock_fd, SOL_SOCKET, SO_REUSEADDR, (void *) &option, sizeof(option)) < 0)
-    {
-        cout << "ERROR setting socket options for multicast. Closing the socket" << endl;
-        close(multicast_sock_fd);
-        return false;
-    }
-
-    // Setup multicast socket addr
-    struct sockaddr_in multicast_sock_addr;
-    memset((char *) &multicast_sock_addr, 0, sizeof(multicast_sock_addr));
-    multicast_sock_addr.sin_family = AF_INET;
-    multicast_sock_addr.sin_port = htons(multicast_port); // convert port to network
-    // only wait for multicast. give group addr
-    multicast_sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    // Try to bind the waiting socket
-    if(bind(multicast_sock_fd, (struct sockaddr* ) &multicast_sock_addr, sizeof(multicast_sock_addr)) < 0)
-    {
-        cout << "ERROR: Binding the multicast socket failed. " << endl;
-        close(multicast_sock_fd);
-        return false;
-    }
-    cout << "Successfully bound the multicast socket" << endl;
-
-    // Join the multicast group on the addr given in the python constants file
-    /* Note that this IP_ADD_MEMBERSHIP option must be called
-        for each local interface over which the multicast
-        datagrams are to be received.*/
-    struct ip_mreq multicast_group;
-    // This is the address of the group - corresponds to server's MULTICAST_GROUP_IP
-    multicast_group.imr_multiaddr.s_addr = inet_addr(Comm::MULTICAST_GROUP_IP.c_str());
-    multicast_group.imr_interface.s_addr = inet_addr(device_ip.c_str());
-
-    // Set the options for multicast
-    if(setsockopt(multicast_sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&multicast_group, sizeof(multicast_group)) < 0)
-    {
-        std::cerr << "ERROR: Adding multicast membership" << endl;
-        close(multicast_sock_fd);
-        return false;
-    }
-    cout << "Successfully added to multicast group" << endl;
+    if(set_multicast_opt(multicast_sock_fd) == false) {return false;}
 
     // Create a struct to store the source Ip of the broadcast message
     struct sockaddr_in sender_socket_info;
@@ -99,20 +58,20 @@ bool Client::wait_for_multicast()
     return true;
 }
 
-std::string Client::get_sender_ip(struct sockaddr_in sender) const
+std::string Multicaster::get_sender_ip(struct sockaddr_in sender) const
 {
     char ip_str[INET6_ADDRSTRLEN];
     const char* ip =  inet_ntop(AF_INET, &(sender.sin_addr), ip_str, INET6_ADDRSTRLEN);
     return std::string(ip);
 }
 
-int Client::get_sender_port(struct sockaddr_in sender) const
+int Multicaster::get_sender_port(struct sockaddr_in sender) const
 {
     return htons(sender.sin_port);
 }
 
 // Credit: https://stackoverflow.com/a/3120382/13933174
-std::string Client::get_public_ip() const
+std::string Multicaster::get_public_ip() const
 {
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
@@ -141,4 +100,54 @@ std::string Client::get_public_ip() const
 
     close(sock);
     return std::string(ip_buf);
+}
+
+
+// helper functions
+bool Multicaster::set_multicast_opt(int multicast_fd) const
+{
+    int option(1);
+    if(setsockopt(multicast_fd, SOL_SOCKET, SO_REUSEADDR, (void *) &option, sizeof(option)) < 0)
+    {
+        cout << "ERROR setting socket options for multicast. Closing the socket" << endl;
+        close(multicast_fd);
+        return false;
+    }
+
+    // Setup multicast socket addr
+    struct sockaddr_in multicast_sock_addr;
+    memset((char *) &multicast_sock_addr, 0, sizeof(multicast_sock_addr));
+    multicast_sock_addr.sin_family = AF_INET;
+    multicast_sock_addr.sin_port = htons(multicast_port); // convert port to network
+    // only wait for multicast. give group addr
+    multicast_sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    // Try to bind the waiting socket
+    if(bind(multicast_fd, (struct sockaddr* ) &multicast_sock_addr, sizeof(multicast_sock_addr)) < 0)
+    {
+        cout << "ERROR: Binding the multicast socket failed. " << endl;
+        close(multicast_fd);
+        return false;
+    }
+
+        cout << "Successfully bound the multicast socket" << endl;
+
+    // Join the multicast group on the addr given in the python constants file
+    /* Note that this IP_ADD_MEMBERSHIP option must be called
+        for each local interface over which the multicast
+        datagrams are to be received.*/
+    struct ip_mreq multicast_group;
+    // This is the address of the group - corresponds to server's MULTICAST_GROUP_IP
+    multicast_group.imr_multiaddr.s_addr = inet_addr(Comm::MULTICAST_GROUP_IP.c_str());
+    multicast_group.imr_interface.s_addr = inet_addr(device_ip.c_str());
+
+    // Set the options for multicast
+    if(setsockopt(multicast_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&multicast_group, sizeof(multicast_group)) < 0)
+    {
+        std::cerr << "ERROR: Adding multicast membership" << endl;
+        close(multicast_fd);
+        return false;
+    }
+    cout << "Successfully added to multicast group" << endl;
+    return true;
 }
