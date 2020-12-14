@@ -22,7 +22,7 @@ class Server(Thread):
         Thread.__init__(self)
         self.thread_status = threading.Event() # True when thread not running
         Server.set_port(udp_port)
-
+        self.received_msg = False
         self._data_queue = data_queue
 
     def run(self):
@@ -35,21 +35,30 @@ class Server(Thread):
         sock = socket.socket(socket.AF_INET,  # Use the internet
                             socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
         sock.bind((udp_ip, self._udp_port))
         # sock.bind((hostname, self._udp_port))
         print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
 
         # Wait for a connection
-        while not self.thread_status.isSet():
-            raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-            data = raw_data.decode()
-            client_ip_addr, client_port = raw_addr
+        while not self.thread_status.isSet() and self.received_msg is False:
+            try:
+                raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+                data = raw_data.decode()
+                client_ip_addr, client_port = raw_addr
 
-            data_dict = {'data': data.strip(), 'client_ip': client_ip_addr, 'client_port': client_port}
-            self._data_queue.put(data_dict)
+                data_dict = {'data': data.strip(), 'client_ip': client_ip_addr, 'client_port': client_port}
+                self._data_queue.put(data_dict)
 
-            self.thread_status.set()
+                self.received_msg = True
+            except:
+                # If no msg received, just start loop again
+                pass
 
+    def stop_thread(self):
+        """ Handles the end of the thread by setting and joining"""
+        self.thread_status.set()
+        self._stop_thread = True
 
     # Class methods to handle multicasting / multicasting to Pi
     @classmethod
@@ -106,7 +115,7 @@ class Server(Thread):
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
         try:
-            print("Sending multicast to LAN")
+            print(f"Sending multicast to LAN on group {multicast_group}")
             sent = sock.sendto(msg.encode(), multicast_group)
             # Don't care about responses
         finally:
