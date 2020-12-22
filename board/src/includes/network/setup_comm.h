@@ -48,6 +48,8 @@ class SetupComm
         /**
          * @brief Thread function!!! Wraps other functions in a loop with timeout / sigint killability.
          *  Allows for exit handler to kill thread easily by setting the atomic to false.
+         * @note This will keep running, even after initial establishment of comms.
+         * Handles the case where server dies and need to restart program
          */
         void run_setup_receiver();
 

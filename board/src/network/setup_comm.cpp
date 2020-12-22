@@ -18,7 +18,6 @@ SetupComm::~SetupComm()
     close_recv_sock();
 }
 
-// Thread function
 void SetupComm::run_setup_receiver()
 {
     // sets to true for edge cases on startup of thread
@@ -29,9 +28,6 @@ void SetupComm::run_setup_receiver()
     {
         if(wait_for_setup_msg() == true)
         {
-            stop_running_receiver();
-            // cout << "Successfully received a setup msg and updated values" << endl;
-
             // respond tp server once the setup is complete on this end
             respond_to_server();
         }
@@ -239,6 +235,7 @@ void SetupComm::respond_to_server()
         cout << "ERROR: sending response packet confirming setup" << endl;
     }
     close(response_sock_fd);
+    cout << "---------------------------------" << endl << endl;
 }
 
 std::string SetupComm::fix_decoded_msg(std::string buf)
