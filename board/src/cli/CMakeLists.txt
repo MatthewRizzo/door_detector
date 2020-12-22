@@ -1,7 +1,7 @@
 # use this to find in main dir
-add_library(GPIO_CLI_Processor
-    CLI_processor.cpp
+add_library(CLI_CONTROLLER
+    cli_controller.cpp
 )
 
-target_link_libraries(GPIO_CLI_Processor
+target_link_libraries(CLI_CONTROLLER
 )

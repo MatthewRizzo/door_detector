@@ -35,11 +35,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/src/cmak
 find_package(CLI11 REQUIRED) # using https://cliutils.gitlab.io/CLI11Tutorial/
 find_package(wiring_pi REQUIRED)
 find_package(Threads REQUIRED) # stock package needed for WiringPi -- link ${CMAKE_THREAD_LIBS_INIT}
+find_package(JSON REQUIRED)
 
 # Include the package's header files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/includes") # contains project defined headers
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/includes/network")
+
+# external includes
 include_directories(${CLI11_INCLUDE_DIR})
 include_directories(${wiring_pi_INCLUDE_DIRS}) # pair with target_link_libraries(<projName> ${wiring_pi_LIBS})
+include_directories(SYSTEM ${JSON_INCLUDE_DIRS}) # pair with target_link_libraries(<projName> ${wiring_pi_LIBS})
 
 # ============================================ Build individual subdirs ============================================
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin) # store produce binaries in src/bin/*
@@ -48,6 +53,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 # add more folders here as needed
 # these trigger the CMakeLists.txt file to be called in the listed dirs
 add_subdirectory(src/cli)
-add_subdirectory(src/client)
 add_subdirectory(src/gpio)
+add_subdirectory(src/json)
 add_subdirectory(src/main)
+add_subdirectory(src/network)

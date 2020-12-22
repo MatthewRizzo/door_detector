@@ -2,7 +2,34 @@
 
 Project to detect opening of a door using Raspberry Pi, magnetic strip sensor, and wifi communication between the board and a computer.
 
-## Portions of Code
+## User Guide / Setup
+
+### **Building / Running on the board (Client)**
+
+1. Perform the following command (does a fresh setup / install for building):
+`cd board/install`
+`sudo ./setup.sh -a`
+
+2. Navigate back to `board/` and run the following
+`make`
+
+3. Run the binary on the board by doing the following:
+`./board/bin/main_driver`
+The name of the top level executable might change, but it should be aparent which one to run.
+This binary will manage:
+    - The reading/processing of sensor data
+    - Turning any LED's on/off
+    - Spinning up the client thread. Responsible for pinging the server when the door opens.
+
+### **Running on the Server (Computer / laptop)**
+
+**Note: the board's client program must be up and runnning before starting the Server**
+
+1. Navigate to the `server/` dir
+2. Run the following command to start up the server
+`python main.py`
+
+## **Portions of Code**
 
 1. Raspberry Pi Board GPIO Code (C++) - client side
     - Detects the door opening, using magentic strip sensor on door frame
@@ -35,3 +62,12 @@ Folder structure
   - See info_files for circuit diagram
 - Sensor attached to door / door frame to detect opening
 - Other laptop is across the room, not connected by wire to board
+
+### Supplies
+
+- MC-38 Magnetic Switch Door Sensor from Gikfun
+- Raspberry Pi 3 running Raspian (debian based distribution)
+- Computer (running windows)
+- Resistors
+- Wires
+- Breadboard (for circuit)

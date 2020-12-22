@@ -1,4 +1,5 @@
 # Built-in Includes
+import json
 import platform
 from queue import Queue
 import re
@@ -13,6 +14,7 @@ import time
 import constants
 
 class Server(Thread):
+    got_response = False
     """Class responsible for handling all communication's to/from client on the server machine.
     \nKeyword arguments:
     \nport -- The port number to wait for a connection on """
@@ -22,7 +24,7 @@ class Server(Thread):
         Thread.__init__(self)
         self.thread_status = threading.Event() # True when thread not running
         Server.set_port(udp_port)
-
+        self.received_msg = False
         self._data_queue = data_queue
 
     def run(self):
@@ -35,23 +37,33 @@ class Server(Thread):
         sock = socket.socket(socket.AF_INET,  # Use the internet
                             socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
         sock.bind((udp_ip, self._udp_port))
-        # sock.bind((hostname, self._udp_port))
-        print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
+        print("------------------------\n\nCommuncation Protocal Established")
+        print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
 
         # Wait for a connection
-        while not self.thread_status.isSet():
-            raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-            data = raw_data.decode()
-            client_ip_addr, client_port = raw_addr
+        while not self.thread_status.isSet() and self.received_msg is False:
+            try:
+                raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+                data = raw_data.decode()
+                board_ip_addr, client_port = raw_addr
 
-            data_dict = {'data': data.strip(), 'client_ip': client_ip_addr, 'client_port': client_port}
-            self._data_queue.put(data_dict)
+                data_dict = {'data': data.strip(), 'board_ip': board_ip_addr, 'client_port': client_port}
+                self._data_queue.put(data_dict)
 
-            self.thread_status.set()
+                self.received_msg = True
+            except:
+                # If no msg received, just start loop again
+                pass
+        sock.close()
 
+    def stop_thread(self):
+        """ Handles the end of the thread by setting and joining"""
+        self.thread_status.set()
+        self._stop_thread = True
 
-    # Class methods to handle broadcasting / multicasting to Pi
+    # Class methods to handle multicasting / multicasting to Pi
     @classmethod
     def  _platform_check(cls, is_windows: bool = True) -> bool:
         """Utility function that checks what the platform is.
@@ -84,32 +96,49 @@ class Server(Thread):
             return {'hostname' : name, 'ip' : ip_addr}
 
     @classmethod
-    def inform_board(cls):
-        """Function to ping board with a broadcast.
+    def setup_board(cls):
+        """Function to ping board with a simple UDP msg.
         \nGives the board this computer's IP and the port it is waiting on.
-        Ignores responses.
+        Keeps attempting to send until a response is received.
         """
         # Send laptop's IP and port to the board
         data_dict = Server.get_cur_hostname_IP()
         ip = data_dict['ip']
         hostname = data_dict['hostname']
-        multicast_group = ("224.1.1.1", 10000)
 
         # give board hostname, ip, port
-        msg = f"{hostname}, {ip}, {Server.get_port()}"
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(.2)
+        data_json = {'host' : hostname, 'ip' : ip, 'port' : Server.get_port()}
+        board_ip = socket.gethostbyname(constants.BOARD_HOSTNAME)
+        msg = f"Sending msg to ip {board_ip} and port {constants.BOARD_RECV_PORT}."
+        msg += " Will keep trying until a reponse is received."
+        print(msg)
 
-        # Ensure only LAN gets broadcast - set time-to-live to 1, cannot go past router
-        ttl = struct.pack('b', 1)
-        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+        while cls.got_response is False:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.settimeout(.2)
+            try:
+                sent = sock.sendto(json.dumps(data_json).encode('utf-8'), (board_ip, constants.BOARD_RECV_PORT))
+                # Don't care about responses
+            except socket.timeout:
+                sock.close()
 
-        try:
-            print("Sending broadcast to LAN")
-            sent = sock.sendto(msg.encode(), multicast_group)
-            # Don't care about responses
-        finally:
-            sock.close()
+    @classmethod
+    def confirm_board_setup(cls):
+        """BLOCKING - CALL IN THREAD. During setup of communications, waits for response from the board.
+        modifies cls.got_response when it does"""
+        print(f"Starting confirm setup thread. Waits on port {constants.CONFIRMATION_WAIT_PORT}")
+        while cls.got_response is False:
+            recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+            recv_sock.bind((Server.get_cur_hostname_IP()['ip'], constants.CONFIRMATION_WAIT_PORT))
+            recv_sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
+            try:
+                data, address = recv_sock.recvfrom(1024, 0)
+                print(f"Received confirmation {data.decode()}")
+                cls.set_got_reponse(True)
+            except socket.timeout:
+                recv_sock.close()
+            recv_sock.close()
+
 
     @classmethod
     def get_port(cls):
@@ -127,3 +156,9 @@ class Server(Thread):
         for key, val in data.items():
             msg.append(f"{key}: {val}")
         return '\n'.join(msg)
+
+    @classmethod
+    def set_got_reponse(cls, new_got_response: bool = True):
+        """Sets the class variable governing if setup_board has received a response or not.
+        When set to True, the setup_board and wait for confirmation loops end"""
+        cls.got_response = new_got_response
