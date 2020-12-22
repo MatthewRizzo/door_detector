@@ -48,19 +48,17 @@ if __name__ == "__main__":
 
     notif = Notification()
 
-
-
     # Setup the board by giving the port and ip on this machine (server) to send messages to
     setup_thread = Thread(target = Server.setup_board)
 
     # Wait for the client (board) to confirm recepit of setup packet
-    # confirm_thread = Thread(target = Server.confirm_board_setup)
+    confirm_thread = Thread(target = Server.confirm_board_setup)
 
     setup_thread.start()
-    # confirm_thread.start()
+    confirm_thread.start()
 
     setup_thread.join()
-    # confirm_thread.join()
+    confirm_thread.join()
 
     #TODO: wait for response from setup_board and save info
 

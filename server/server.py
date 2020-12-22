@@ -39,8 +39,8 @@ class Server(Thread):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
         sock.bind((udp_ip, self._udp_port))
-        # sock.bind((hostname, self._udp_port))
-        print(f"Server is waiting for connection from client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
+        print("------------------------\n\nCommuncation Protocal Established")
+        print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
 
         # Wait for a connection
         while not self.thread_status.isSet() and self.received_msg is False:
@@ -129,7 +129,7 @@ class Server(Thread):
         print(f"Starting confirm setup thread. Waits on port {constants.CONFIRMATION_WAIT_PORT}")
         while cls.got_response is False:
             recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
-            recv_sock.bind(('localhost', constants.CONFIRMATION_WAIT_PORT))
+            recv_sock.bind((Server.get_cur_hostname_IP()['ip'], constants.CONFIRMATION_WAIT_PORT))
             recv_sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
             try:
                 data, address = recv_sock.recvfrom(1024, 0)
