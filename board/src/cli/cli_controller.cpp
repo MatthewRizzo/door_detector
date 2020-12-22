@@ -53,11 +53,17 @@ void CLI_parser::setup_flags()
         ->check(CLI::IsMember(led_list))
         ->join(delim);
 
-    add_option("-bp,--multicast_port",
-            cli_results[CLI::ParseMetaData::MULTICAST_PORT])
-        ->description("Which port do you want to use for the Broadcast wait socket?")
+    add_option("-r,--setup_recv_port",
+            cli_results[CLI::ParseMetaData::SETUP_RECV_PORT])
+        ->description("Which port do you want to use for the Setup wait (recv) socket?")
         ->required(false)
-        ->default_val(Comm::DEFAULT_MULTICAST_PORT);
+        ->default_val(Comm::DEFAULT_SETUP_RECV_PORT);
+
+    add_option("-s,--setup_send_port",
+            cli_results[CLI::ParseMetaData::SETUP_SEND_PORT])
+        ->description("Which port do you want to use for the Setup confirm (send) socket?")
+        ->required(false)
+        ->default_val(Comm::DEFAULT_SETUP_SEND_PORT);
 }
 
 }; // end of namespace

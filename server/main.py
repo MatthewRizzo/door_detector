@@ -6,6 +6,7 @@
 from queue import Queue
 import signal
 import sys
+from threading import Thread
 
 # project includes
 from server import Server
@@ -37,6 +38,7 @@ def signal_handler(sig, frame):
     print("Caught ctrl+c: ")
     global keep_running
     keep_running = False
+    Server.set_got_reponse()
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
@@ -46,8 +48,21 @@ if __name__ == "__main__":
 
     notif = Notification()
 
-    # Send multicast so board knows what server's IP and port are
-    Server.inform_board()
+
+
+    # Setup the board by giving the port and ip on this machine (server) to send messages to
+    setup_thread = Thread(target = Server.setup_board)
+
+    # Wait for the client (board) to confirm recepit of setup packet
+    # confirm_thread = Thread(target = Server.confirm_board_setup)
+
+    setup_thread.start()
+    # confirm_thread.start()
+
+    setup_thread.join()
+    # confirm_thread.join()
+
+    #TODO: wait for response from setup_board and save info
 
     server = Server(client_data, udp_port)
     server.start() # Startup the server

@@ -1,5 +1,16 @@
 MULTICAST_RANGE = ["224.0.0.0", "230.255.255.255"] # Not to use, but is a reference
 MULTICAST_GROUP_IP = "224.1.1.1" # NEED to make a constant to be mutual with C++ code
-MULTI_CAST_PORT =  10000
+MULTICAST_PORT =  55054
+MULTICAST_INTERFACE = "203.106.93.94"
+
+
 ALERT_URL = "alert"
-SOCKET_TIMEOUT_SEC = .1 
+
+# Constants related to client (board)
+BOARD_RECV_PORT = 52535
+BOARD_HOSTNAME = "192.168.1.220" # "MATT-ROG-LAPTOP" # TODO: change this to board hostname or static IP
+
+# Constants related to waiting for confirmation of setup from board
+CONFIRMATION_WAIT_PORT = 55554
+
+SOCKET_TIMEOUT_SEC = 5
