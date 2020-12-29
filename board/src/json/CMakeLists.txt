@@ -5,3 +5,7 @@ add_library(JSON_UTILS
 
 target_link_libraries(JSON_UTILS
 )
+
+target_compile_options(JSON_UTILS
+    PRIVATE
+)

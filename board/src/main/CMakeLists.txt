@@ -11,3 +11,7 @@ target_link_libraries(main_driver
     GPIO_Controller
     NETWORK
 )
+
+target_compile_options(main_driver
+    PRIVATE
+)

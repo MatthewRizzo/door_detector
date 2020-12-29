@@ -5,3 +5,7 @@ add_library(CLI_CONTROLLER
 
 target_link_libraries(CLI_CONTROLLER
 )
+
+target_compile_options(CLI_CONTROLLER
+    PRIVATE
+)
