@@ -3,5 +3,5 @@ add_library(JSON_UTILS
     json_utils.cpp
 )
 
-target_link_libraries(JSON
+target_link_libraries(JSON_UTILS
 )
