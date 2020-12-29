@@ -55,9 +55,10 @@ int main(int argc, char* argv[])
     //-------------- Initialize and Start --------------//
     tvec threads;
 
-    // Multicaster initialization and start
-    setup.set_recv_setup_port(std::stoi(parse_res["sr_port"]));
-    setup.set_send_confirm_port(std::stoi(parse_res["ss_port"]));
+    // Setup Comms initialization and start
+    setup.set_verbosity(parse_res["v_setup"])
+        ->set_recv_setup_port(std::stoi(parse_res["sr_port"]))
+        ->set_send_confirm_port(std::stoi(parse_res["ss_port"]));
 
     threads.push_back(std::thread(&SetupComm::run_setup_receiver, std::ref(setup)));
 

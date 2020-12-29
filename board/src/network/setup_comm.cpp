@@ -65,16 +65,27 @@ bool SetupComm::wait_for_setup_msg()
     return std::get<1>(sender_info);
 }
 
-void SetupComm::set_recv_setup_port(int port)
+SetupComm* SetupComm::set_recv_setup_port(int port)
 {
     std::unique_lock<std::mutex> lck (mtx);
     recv_port = port;
+    return this;
 }
 
-void SetupComm::set_send_confirm_port(int port)
+SetupComm* SetupComm::set_send_confirm_port(int port)
 {
     std::unique_lock<std::mutex> lck (mtx);
     send_confirm_port = port;
+    return this;
+}
+
+SetupComm* SetupComm::set_verbosity(std::string is_verbose)
+{
+    bool verbose = is_verbose == "true" ? true : false;
+
+    std::unique_lock<std::mutex> lck (mtx);
+    this->is_verbose = verbose;
+    return this;
 }
 
 void SetupComm::set_server_ip_port(const ServerInfo sender)
@@ -158,7 +169,10 @@ std::pair<struct ServerInfo, bool> SetupComm::rcv_msg(int recv_sock_fd)
         close_recv_sock();
         return std::make_pair(sender_socket_info, false);
     }
-    cout << "Received Setup Message: " << std::string(data_buffer) << endl;
+    if(is_verbose == true)
+    {
+        cout << "Received Setup Message: " << std::string(data_buffer) << endl;
+    }
     parse_msg(std::string(data_buffer), sender_socket_info);
     return std::make_pair(sender_socket_info, true);
 }
@@ -228,14 +242,20 @@ void SetupComm::respond_to_server()
     send_dest.sin_addr.s_addr = inet_addr(get_server_ip().c_str());
     send_dest.sin_family = AF_INET;
     send_dest.sin_port = htons(send_confirm_port);
-    cout << "Acknowledging setup completion by sending ACK to server (computer)";
-    cout << " port " << send_confirm_port << " and IP: " << get_server_ip() << endl;
+    if(is_verbose == true)
+    {
+        cout << "Acknowledging setup completion by sending ACK to server (computer)";
+        cout << " port " << send_confirm_port << " and IP: " << get_server_ip() << endl;
+    }
     if(sendto(response_sock_fd, (const char*) send_buf, sizeof(send_buf), 0, (sockaddr *) &send_dest, sizeof(send_dest)) < 0)
     {
         cout << "ERROR: sending response packet confirming setup" << endl;
     }
     close(response_sock_fd);
-    cout << "---------------------------------" << endl << endl;
+    if(is_verbose)
+    {
+        cout << "---------------------------------" << endl << endl;
+    }
 }
 
 std::string SetupComm::fix_decoded_msg(std::string buf)

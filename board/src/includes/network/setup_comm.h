@@ -42,8 +42,12 @@ class SetupComm
         virtual ~SetupComm();
 
         // API Functions
-        void set_recv_setup_port(int port);
-        void set_send_confirm_port(int port);
+        /**
+         * @pre is_verbose is a string of the form "true" or "false" (from CLI flag)
+         */
+        SetupComm* set_verbosity(std::string is_verbose);
+        SetupComm* set_recv_setup_port(int port);
+        SetupComm* set_send_confirm_port(int port);
 
         /**
          * @brief Thread function!!! Wraps other functions in a loop with timeout / sigint killability.
@@ -107,6 +111,7 @@ class SetupComm
 
 
         // --------- Member Variables -------//
+        bool is_verbose; // used to conntrol the level of print statements made
 
         // Variables for responding to server
         ServerInfo server_config;

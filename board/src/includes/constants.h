@@ -15,12 +15,17 @@ namespace CLI::ParseMetaData
     using parse_results = std::map<std::string, std::string>;
 
     const std::string LED                {"led"};
+
+    // related to Comms
     const std::string SETUP_RECV_PORT    {"sr_port"};
     const std::string SETUP_SEND_PORT    {"ss_port"};
+    const std::string VERBOSE_SETUP      {"v_setup"};
 }; // end of parse namespace for CLI
 
 namespace Comm
 {
+    const bool DEFAULT_VERBOSITY            {false};
+
     constexpr int DEFAULT_SERVER_PORT       {55555}; // used when sending to server
     constexpr int DATA_BUFFER_SIZE          {1024};
 

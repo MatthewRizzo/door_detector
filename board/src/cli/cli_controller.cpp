@@ -64,6 +64,12 @@ void CLI_parser::setup_flags()
         ->description("Which port do you want to use for the Setup confirm (send) socket?")
         ->required(false)
         ->default_val(Comm::DEFAULT_SETUP_SEND_PORT);
+
+    add_flag("-k,--setup_verbose",
+            cli_results[CLI::ParseMetaData::VERBOSE_SETUP])
+        ->description("Use this to make comms Setup more verbose.")
+        ->default_val(Comm::DEFAULT_VERBOSITY)
+        ->required(false);
 }
 
 }; // end of namespace
