@@ -29,15 +29,12 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -e | --extern )
             relative_dir="extern"
-            break
             ;;
         -i | --install )
             relative_dir="install"
-            break
             ;;
         -s | --src )
             relative_dir="src"
-            break
             ;;
         -f | --filename )
             file_name="$2"
