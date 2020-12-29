@@ -18,7 +18,7 @@ def clear_queue(q: Queue):
     while not q.empty:
         q.get()
 
-keep_running = True
+program_ended = False
 
 
 def wait_for_board(server: Server, client_data: Queue) -> str:
@@ -36,8 +36,8 @@ def wait_for_board(server: Server, client_data: Queue) -> str:
 
 def signal_handler(sig, frame):
     print("Caught ctrl+c: ")
-    global keep_running
-    keep_running = False
+    global program_ended
+    program_ended = True
     Server.set_got_reponse()
 
 if __name__ == "__main__":
@@ -61,12 +61,12 @@ if __name__ == "__main__":
     confirm_thread.join()
 
     #TODO: wait for response from setup_board and save info
-
-    server = Server(client_data, udp_port)
-    server.start() # Startup the server
+    if program_ended is False:
+        server = Server(client_data, udp_port)
+        server.start() # Startup the server
 
     # Constantly wait for a msg that the door has been opened from the board
-    while True and keep_running is True:
+    while True and program_ended is False:
         data = wait_for_board(server, client_data)
 
         if data is not None:

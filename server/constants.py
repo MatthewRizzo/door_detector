@@ -8,7 +8,7 @@ ALERT_URL = "alert"
 
 # Constants related to client (board)
 BOARD_RECV_PORT = 52535
-BOARD_HOSTNAME = "192.168.1.220" # "MATT-ROG-LAPTOP" # TODO: change this to board hostname or static IP
+BOARD_HOSTNAME = "matt-rpi3b"
 
 # Constants related to waiting for confirmation of setup from board
 CONFIRMATION_WAIT_PORT = 55554
