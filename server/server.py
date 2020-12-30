@@ -96,7 +96,7 @@ class Server(Thread):
             return {'hostname' : name, 'ip' : ip_addr}
 
     @classmethod
-    def setup_board(cls):
+    def send_handshake(cls, client_hostname, board_handshake_recv_port):
         """Function to ping board with a simple UDP msg.
         \nGives the board this computer's IP and the port it is waiting on.
         Keeps attempting to send until a response is received.
@@ -108,8 +108,8 @@ class Server(Thread):
 
         # give board hostname, ip, port
         data_json = {'host' : hostname, 'ip' : ip, 'port' : Server.get_port()}
-        board_ip = socket.gethostbyname(constants.BOARD_HOSTNAME)
-        msg = f"Sending msg to ip {board_ip} and port {constants.BOARD_RECV_PORT}."
+        board_ip = socket.gethostbyname(client_hostname)
+        msg = f"Sending msg to ip {board_ip} and port {board_handshake_recv_port}."
         msg += " Will keep trying until a reponse is received."
         print(msg)
 
@@ -117,13 +117,13 @@ class Server(Thread):
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(.2)
             try:
-                sent = sock.sendto(json.dumps(data_json).encode('utf-8'), (board_ip, constants.BOARD_RECV_PORT))
+                sent = sock.sendto(json.dumps(data_json).encode('utf-8'), (board_ip, constants.BOARD_HANDSHAKE_RECV_PORT))
                 # Don't care about responses
             except socket.timeout:
                 sock.close()
 
     @classmethod
-    def confirm_board_setup(cls):
+    def confirm_handshake(cls):
         """BLOCKING - CALL IN THREAD. During setup of communications, waits for response from the board.
         modifies cls.got_response when it does"""
         print(f"Starting confirm setup thread. Waits on port {constants.CONFIRMATION_WAIT_PORT}")
@@ -159,6 +159,6 @@ class Server(Thread):
 
     @classmethod
     def set_got_reponse(cls, new_got_response: bool = True):
-        """Sets the class variable governing if setup_board has received a response or not.
-        When set to True, the setup_board and wait for confirmation loops end"""
+        """Sets the class variable governing if send_handshake has received a response or not.
+        When set to True, the send_handshake and wait for confirmation loops end"""
         cls.got_response = new_got_response
