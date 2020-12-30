@@ -7,7 +7,7 @@ MULTICAST_INTERFACE = "203.106.93.94"
 ALERT_URL = "alert"
 
 # Constants related to client (board)
-BOARD_RECV_PORT = 52535
+BOARD_HANDSHAKE_RECV_PORT = 52535
 BOARD_HOSTNAME = "matt-rpi3b"
 
 # Constants related to waiting for confirmation of setup from board

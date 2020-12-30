@@ -11,6 +11,7 @@ from threading import Thread
 # project includes
 from server import Server
 from notification import Notification
+from cli_parser import Parser
 
 udp_port = 52160
 
@@ -42,6 +43,10 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
+    parser = Parser()
+    args = parser.args
+
+    server = None
 
     # Will store data, addr after recvfrom
     client_data = Queue()
@@ -49,10 +54,10 @@ if __name__ == "__main__":
     notif = Notification()
 
     # Setup the board by giving the port and ip on this machine (server) to send messages to
-    setup_thread = Thread(target = Server.setup_board)
+    setup_thread = Thread(target = Server.send_handshake, args=(args.client_hostname, args.client_handshake_port))
 
     # Wait for the client (board) to confirm recepit of setup packet
-    confirm_thread = Thread(target = Server.confirm_board_setup)
+    confirm_thread = Thread(target = Server.confirm_handshake)
 
     setup_thread.start()
     confirm_thread.start()
@@ -60,7 +65,7 @@ if __name__ == "__main__":
     setup_thread.join()
     confirm_thread.join()
 
-    #TODO: wait for response from setup_board and save info
+    #TODO: wait for response from send_handshake and save info
     if program_ended is False:
         server = Server(client_data, udp_port)
         server.start() # Startup the server
@@ -73,12 +78,12 @@ if __name__ == "__main__":
             # Alert user whenever it gets a msg
             notif.alert()
 
-
     # Kill the server thread
-    server.stop_thread()
-    server.join()
-    print("Done with join for server")
-    server = None
+    if server is not None:
+        server.stop_thread()
+        server.join()
+        print("Done with join for server")
+        server = None
 
     sys.exit(1)
 
