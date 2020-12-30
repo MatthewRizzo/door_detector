@@ -10,7 +10,7 @@
 // Project Includes
 #include "cli_controller.h"
 #include "constants.h"
-#include "setup_comm.h"
+#include "handshake_controller.h"
 
 using std::cerr;
 using std::endl;
@@ -20,8 +20,6 @@ using tvec = std::vector<std::thread>;
 
 int main(int argc, char* argv[])
 {
-    //TODO: Startup client thread
-    static SetupComm setup;
 
     //TODO: create GPIO object
     // led list will come from here
@@ -43,11 +41,14 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    //TODO: Startup client thread
+    static HandshakeController handshake;
+
     //-------------- Create Ctrl+C Handler --------------//
     std::signal(SIGINT, [](int signum) {
         cout << "Caught ctrl+c: " << signum << endl;
         // Include any call backs to join/kill threads
-        setup.stop_running_receiver();
+        handshake.stop_running_receiver();
 
 
     });
@@ -55,12 +56,13 @@ int main(int argc, char* argv[])
     //-------------- Initialize and Start --------------//
     tvec threads;
 
-    // Setup Comms initialization and start
-    setup.set_verbosity(parse_res["v_setup"])
+    // Handshake to setup comms - set static variables
+    handshake.set_verbosity(parse_res["v_setup"])
         ->set_recv_setup_port(std::stoi(parse_res["sr_port"]))
         ->set_send_confirm_port(std::stoi(parse_res["ss_port"]));
 
-    threads.push_back(std::thread(&SetupComm::run_setup_receiver, std::ref(setup)));
+    // Commented out for now to focus on GPIO code
+    threads.push_back(std::thread(&HandshakeController::run_setup_receiver, std::ref(handshake)));
 
     // close all threads
     for(auto &thread : threads)
@@ -72,7 +74,7 @@ int main(int argc, char* argv[])
     }
 
 
-    // setup.start_setup_thread();
+    // handshake.start_setup_thread();
 
     return EXIT_SUCCESS;
 }

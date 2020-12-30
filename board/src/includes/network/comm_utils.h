@@ -1,3 +1,6 @@
+#ifndef COMM_UTILS_H
+#define COMM_UTILS_H
+
 #include <arpa/inet.h> // used by inet_addr
 #include <assert.h>
 #include <iostream>
@@ -18,3 +21,5 @@ public:
      */
     static std::string get_public_ip();
 };
+
+#endif
