@@ -27,5 +27,6 @@ void HandshakeController::run_setup_receiver()
             // respond to server once the setup is complete on this end
             respond_to_server();
         }
+        cout << "UPDATED SERVER: ip = " << get_server_ip() << ", port = " << get_server_port() << endl;
     }
 }
