@@ -21,10 +21,11 @@ using rcode = std::pair<bool, std::string>;
 
 struct DestInfo
 {
-    std::string ip;
     int port;
+    std::string ip;
     DestInfo(int dest_port, std::string dest_ip):
-        port(dest_port), ip(dest_ip)
+        port(dest_port),
+        ip(dest_ip)
         {};
 };
 

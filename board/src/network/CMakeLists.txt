@@ -1,9 +1,5 @@
-# use this to find in main dir
-add_library(NETWORK
-    HANDSHAKE
-    UDP
-)
 
+# Create the Handshake library and set it to private
 add_library(HANDSHAKE
     comm_utils.cpp
     confirm_handshake.cpp
@@ -12,9 +8,14 @@ add_library(HANDSHAKE
     recv_handshake.cpp
 )
 
-add_library(UDP
-    udp_sender.cpp
+target_compile_options(HANDSHAKE
+    PRIVATE
 )
 
-target_link_libraries(NETWORK
+# Create the udp library and set it to private
+add_library(COMMS
+    udp_sender.cpp
+)
+target_compile_options(COMMS
+    PRIVATE
 )
