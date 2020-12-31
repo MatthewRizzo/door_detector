@@ -82,9 +82,9 @@ namespace GPIO
     };
     enum class door_status_codes
     {
-                            // door is open -> sensors apart -> read a 0 = low
-                                        open    = LOW,
-                                        closed  = HIGH,
+                            // door is closed -> sensors together -> read a 0 = low
+                                        closed    = LOW,
+                                        open      = HIGH,
     };
 }
 
