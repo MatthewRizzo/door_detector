@@ -26,9 +26,10 @@ def wait_for_board(server: Server, client_data: Queue) -> str:
     socket_response_dict = {'data':None}
     # Only check queue if thread set - got a response from board
     if server.received_msg is True:
-        socket_response_dict = client_data.get(block=False)
-        print(Server.translate_socket_dict(socket_response_dict))
-        clear_queue(client_data)
+        if not client_data.empty():
+            socket_response_dict = client_data.get(block=False)
+            print(Server.translate_socket_dict(socket_response_dict))
+            clear_queue(client_data)
         server.join()
 
     return socket_response_dict['data'] # None unless a msg received
