@@ -25,17 +25,19 @@ void HandshakeController::run_setup_receiver()
         // save the last values, only print the update if they are different
         static ServerInfo prev_val(get_server_port(), get_server_ip());
 
+
         if(wait_for_setup_msg() == true)
         {
-
             // respond to server once the setup is complete on this end
             respond_to_server();
         }
 
+
         // check if the values have changed
-        if(strcmp(get_server_ip().c_str(), prev_val.ip.c_str()) != 0 || get_server_port() != prev_val.port)
+        if(get_server_ip().compare(prev_val.ip) != 0 || get_server_port() != prev_val.port)
         {
             cout << "UPDATED SERVER: ip = " << get_server_ip() << ", port = " << get_server_port() << endl;
         }
+
     }
 }

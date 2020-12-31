@@ -35,7 +35,6 @@ bool UDPSender::perform_send(std::string msg)
     send_dest.sin_addr.s_addr = inet_addr(dest.ip.c_str());
     send_dest.sin_family = AF_INET;
     send_dest.sin_port = htons(dest.port);
-    cout << "DEBUG: before send to if" << endl;
     if(is_verbose == true)
     {
         cout << "Sending msg to ip" << dest.ip << " on port " << dest.port << endl;

@@ -35,10 +35,6 @@ void GPIOController::run_door_thread()
         // Keep updating destination using the current values from handshake thread
         set_server_info(handshake->get_server_config());
 
-        std::unique_lock<std::mutex> lck(mtx);
-        cout << "DEBUG: current server config: ip = " << destination.ip << " port = " << destination.port << endl;
-        lck.unlock();
-
         // Only run the thread if they are non-default garbage values
         if(destination.port == COMM::GARBAGE_SERVER_PORT || destination.ip == COMM::GARBAGE_SERVER_IP)
         {
@@ -52,7 +48,7 @@ void GPIOController::run_door_thread()
             {
                 if(is_verbose)
                 {
-                    std::unique_lock<std::mutex> lck;
+                    std::unique_lock<std::mutex> lck(mtx);
                     cout << "Sending notification packet that door has opened" << endl;
                 }
 
@@ -101,7 +97,7 @@ GPIOController* GPIOController::set_door_sensor_pin(int pin_num)
 {
     std::unique_lock<std::mutex> lck (mtx);
     door_sensor_pin = pin_num;
-    lck.release();
+    lck.unlock();
 
     // update pin configuration
     return configure_pins();
