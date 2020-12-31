@@ -42,7 +42,7 @@ bool UDPSender::perform_send(std::string msg)
     }
     if(sendto(sock_fd, c_msg, sizeof(c_msg), 0, (sockaddr *) &send_dest, sizeof(send_dest)) < 0)
     {
-        cout << "ERROR: sending msg to to ip" << dest.ip << " on port " << dest.port << endl;
+        cout << "ERROR: sending msg to ip" << dest.ip << " on port " << dest.port << endl;
         return false;
     }
     close_sock();

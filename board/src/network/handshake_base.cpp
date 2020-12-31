@@ -5,10 +5,10 @@ HandshakeBase::HandshakeBase():
 {
 
     server_config.ip = "";
-    server_config.port = Comm::DEFAULT_SERVER_PORT;
+    server_config.port = COMM::DEFAULT_SERVER_PORT;
 
-    // default to allow  receipt of msg from server
-    continue_receiving.store(true);
+    // dont actually start the thread until requested
+    continue_receiving.store(false);
 }
 
 HandshakeBase::~HandshakeBase()
@@ -55,6 +55,10 @@ void HandshakeBase::stop_running_receiver()
 {
     // Setting this will stop the main loop of the thread
     continue_receiving.store(false);
+    if(get_verbosity())
+    {
+        cout << "Ending Handshake thread" << endl;
+    }
     close_recv_sock();
 }
 
@@ -88,11 +92,10 @@ int HandshakeBase::get_send_confirm_port() const
 
 ServerInfo HandshakeBase::get_server_config() const
 {
-    std::unique_lock<std::mutex> lck (mtx);
-    ServerInfo tmp;
-    tmp.ip = server_config.ip;
-    tmp.port = server_config.port;
-    lck.release();
+    std::unique_lock<std::mutex> lck(mtx);
+    ServerInfo tmp(server_config.port, server_config.ip);
+    lck.unlock();
+
     return tmp;
 }
 

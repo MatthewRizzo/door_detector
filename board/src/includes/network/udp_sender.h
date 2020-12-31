@@ -13,17 +13,24 @@
 #include <netinet/in.h> // used by sockaddr_in
 #include <unistd.h> // used by open/close
 
+// project defined includes
+#include "constants.h"
+
 using std::cout;
 using std::endl;
 using std::cerr;
 
 using rcode = std::pair<bool, std::string>;
 
-struct DestInfo
+struct ServerInfo
 {
     int port;
     std::string ip;
-    DestInfo(int dest_port, std::string dest_ip):
+    ServerInfo():
+        port(COMM::GARBAGE_SERVER_PORT),
+        ip(COMM::GARBAGE_SERVER_IP)
+        {};
+    ServerInfo(int dest_port, std::string dest_ip):
         port(dest_port),
         ip(dest_ip)
         {};
@@ -49,7 +56,7 @@ class UDPSender
         bool perform_send(std::string msg);
 
         // class members
-        DestInfo dest;
+        ServerInfo dest;
         int sock_fd;
         bool is_verbose;
 

@@ -57,18 +57,32 @@ void CLI_parser::setup_flags()
             cli_results[CLI::ParseMetaData::SETUP_RECV_PORT])
         ->description("Which port do you want to use for the Setup wait (recv) socket?")
         ->required(false)
-        ->default_val(Comm::DEFAULT_SETUP_RECV_PORT);
+        ->default_val(COMM::DEFAULT_SETUP_RECV_PORT);
 
     add_option("-s,--setup_send_port",
             cli_results[CLI::ParseMetaData::SETUP_SEND_PORT])
         ->description("Which port do you want to use for the Setup confirm (send) socket?")
         ->required(false)
-        ->default_val(Comm::DEFAULT_SETUP_SEND_PORT);
+        ->default_val(COMM::DEFAULT_SETUP_SEND_PORT);
+
+    add_option("-d,--door_sensor_pin",
+            cli_results[CLI::ParseMetaData::DOOR_SENSOR_PIN])
+        ->description("Which port do you want to use for the Setup confirm (send) socket?")
+        ->required(false)
+        ->default_val(GPIO::DEFAULT_DOOR_SENSOR_PIN);
+
+    // bool flags
 
     add_flag("-k,--setup_verbose",
             cli_results[CLI::ParseMetaData::VERBOSE_SETUP])
         ->description("Use this to make comms Setup more verbose.")
-        ->default_val(Comm::DEFAULT_VERBOSITY)
+        ->default_val(COMM::DEFAULT_VERBOSITY)
+        ->required(false);
+
+    add_flag("-v,--gpio_verbose",
+            cli_results[CLI::ParseMetaData::VERBOSE_GPIO])
+        ->description("Use this to make GPIO more verbose.")
+        ->default_val(GPIO::DEFAULT_VERBOSITY)
         ->required(false);
 }
 

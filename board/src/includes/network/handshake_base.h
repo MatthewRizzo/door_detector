@@ -14,22 +14,18 @@
 // 3rd party includes
 #include <json.hpp>
 
-// project defines
+// project defined includes
 #include "comm_utils.h"
 #include "constants.h"
 #include "json_utils.h"
+#include "udp_sender.h"
+
 
 using std::cout;
 using std::endl;
 using std::cerr;
 
 using json = nlohmann::json;
-
-struct ServerInfo
-{
-    std::string ip;
-    int port;
-};
 
 class HandshakeBase
 {

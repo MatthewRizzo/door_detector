@@ -11,15 +11,13 @@ HandshakeController::HandshakeController():
 
 HandshakeController::~HandshakeController()
 {
-
 }
 
 void HandshakeController::run_setup_receiver()
 {
-    // sets to true for edge cases on startup of thread
-    set_continue_receiving(true);
     cout << "Waiting for server to send a msg on port " << get_recv_port();
     cout << " and ip " << get_board_ip() << endl;
+    set_continue_receiving(true);
     while(get_continue_receiving() == true)
     {
         if(wait_for_setup_msg() == true)

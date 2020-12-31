@@ -14,7 +14,7 @@
 // 3rd party includes
 #include <json.hpp>
 
-// project defines
+// project defined includes
 #include "comm_utils.h"
 #include "constants.h"
 #include "json_utils.h"

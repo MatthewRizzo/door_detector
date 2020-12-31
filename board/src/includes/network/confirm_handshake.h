@@ -13,7 +13,7 @@
 
 // 3rd party includes
 
-// project defines
+// project defined includes
 #include "comm_utils.h"
 #include "constants.h"
 #include "handshake_base.h"

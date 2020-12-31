@@ -69,8 +69,8 @@ bool RecvHandshake::set_recv_opt(int recv_sock_fd) const
 
     // Add the option for timeout on the socket (allows for exit handler to kill socket)
     struct timeval tv;
-    tv.tv_sec = Comm::TIMEOUT_SEC;
-    tv.tv_usec = Comm::TIMEOUT_SEC;
+    tv.tv_sec = COMM::TIMEOUT_SEC;
+    tv.tv_usec = COMM::TIMEOUT_SEC;
     if (setsockopt(recv_sock_fd, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0)
     {
         std::cerr << "ERROR: Adding timeout to Recv Hanndshake socket" << endl;
@@ -98,7 +98,7 @@ std::pair<struct ServerInfo, bool> RecvHandshake::rcv_msg(int recv_sock_fd)
     memset((char *) &sender_socket_info, 0, sizeof(sender_socket_info));
 
     // Read from the socket
-    char data_buffer[Comm::DATA_BUFFER_SIZE];
+    char data_buffer[COMM::DATA_BUFFER_SIZE];
     ssize_t rcv_size = recv(recv_sock_fd, data_buffer, sizeof(data_buffer), 0);
     if(rcv_size < 0)
     {
@@ -121,26 +121,26 @@ void RecvHandshake::parse_msg(std::string buf, ServerInfo &server_info)
     std::string buf_no_extra = fix_decoded_msg(buf);
 
     const json& data = json::parse(buf_no_extra);
-    bool has_host = data.contains(Comm::HOST_KEY);
-    bool has_ip = data.contains(Comm::IP_KEY);
-    bool has_port = data.contains(Comm::PORT_KEY);
+    bool has_host = data.contains(COMM::HOST_KEY);
+    bool has_ip = data.contains(COMM::IP_KEY);
+    bool has_port = data.contains(COMM::PORT_KEY);
 
     // if both ip and hostname are given, default to ip
     if(has_ip) {
         // This temporary variable is redundant, but if removed causes strange seg faults
         //TODO: fix this bug. what is cause??
-        std::string ip = data[Comm::IP_KEY].get<std::string>();
+        std::string ip = data[COMM::IP_KEY].get<std::string>();
         server_info.ip = ip;
     }
     else if(has_host)
     {
-        std::string ip = data[Comm::HOST_KEY].get<std::string>();
+        std::string ip = data[COMM::HOST_KEY].get<std::string>();
         server_info.ip = ip;
     }
 
     if(has_port)
     {
-        server_info.port =  data[Comm::PORT_KEY].get<int>();
+        server_info.port =  data[COMM::PORT_KEY].get<int>();
     }
 }
 

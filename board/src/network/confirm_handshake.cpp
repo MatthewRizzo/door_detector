@@ -17,7 +17,7 @@ void ConfirmHandshake::respond_to_server()
     struct sockaddr_in send_socket;
     memset((char *) &send_socket, 0, sizeof(send_socket));
     send_socket.sin_family = AF_INET;
-    send_socket.sin_port = htons(Comm::DEFAULT_SETUP_SEND_BIND_PORT);
+    send_socket.sin_port = htons(COMM::DEFAULT_SETUP_SEND_BIND_PORT);
     send_socket.sin_addr.s_addr = htonl(INADDR_ANY);
     if(bind(response_sock_fd, (struct sockaddr*) &send_socket, sizeof(send_socket)) < 0)
     {
