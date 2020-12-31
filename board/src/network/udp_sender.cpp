@@ -37,11 +37,11 @@ bool UDPSender::perform_send(std::string msg)
     send_dest.sin_port = htons(dest.port);
     if(is_verbose == true)
     {
-        cout << "Sending msg to ip" << dest.ip << " on port " << dest.port << endl;
+        cout << "Sending msg to ip " << dest.ip << " on port " << dest.port << endl;
     }
     if(sendto(sock_fd, c_msg, msg.length()+1, 0, (sockaddr *) &send_dest, sizeof(send_dest)) < 0)
     {
-        cout << "ERROR: sending msg to ip" << dest.ip << " on port " << dest.port << endl;
+        cout << "ERROR: sending msg to ip " << dest.ip << " on port " << dest.port << endl;
         return false;
     }
     close_sock();

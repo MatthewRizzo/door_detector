@@ -81,9 +81,19 @@ namespace GPIO
     };
     enum class door_status_codes
     {
-                            // door is closed -> sensors together -> read a 0 = low
-                                        closed    = LOW,
-                                        open      = HIGH,
+        // door is closed -> sensors together -> read a 0 = low
+        closed    = LOW,
+        open      = HIGH,
+    };
+
+    enum class door_start_status
+    {
+        // Where the "first" iteration is relative to handshake having been completed
+        first_iteration         = -1,
+        started_open            = 0,
+
+        // Once the door has been closed once (either at start or after, notifcations start)
+        closed_at_least_once    = 1,
     };
 }
 

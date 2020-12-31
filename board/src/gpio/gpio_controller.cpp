@@ -5,6 +5,7 @@ GPIOController::GPIOController(HandshakeController* handshake):
     is_verbose(GPIO::DEFAULT_VERBOSITY),
     door_sensor_pin(GPIO::DEFAULT_DOOR_SENSOR_PIN),
     has_been_sent(false),
+    door_start_status(GPIO::door_start_status::first_iteration),
     destination(), // use default constructor to get garbage values
     handshake(handshake)
 {
@@ -36,33 +37,21 @@ void GPIOController::run_door_thread()
         set_server_info(handshake->get_server_config());
 
         // Only run the thread if they are non-default garbage values
-        // When compare == 0, strings are the same (still garbage)
-        if(destination.port == COMM::GARBAGE_SERVER_PORT || destination.ip.compare(COMM::GARBAGE_SERVER_IP) == 0)
+        if(!is_handshake_completed()) {continue;}
+
+        bool door_opened = read_door_sensor();
+
+        // check if door started open (only on first iteration of loop)
+        manage_door_start_status(door_opened);
+
+        if(door_opened)
         {
-            continue;
-        }
-
-        if(read_door_sensor())
-        {
-            std::unique_lock<std::mutex> lck(mtx);
-            lck.unlock();
-
-            // only send 1 msg per door opening
-            if(has_been_sent == false)
-            {
-                if(is_verbose)
-                {
-                    std::unique_lock<std::mutex> lck(mtx);
-                    cout << "Sending notification packet that door has opened" << endl;
-                    lck.unlock();
-                }
-
-                UDPSender sender(destination.port, destination.ip, is_verbose);
-                sender.send_msg("Door Opened");
-                has_been_sent = true;
-            }
+            manage_sending_msg();
         }
         else{
+            // Allows msgs to get sent once the door actually opens
+            door_start_status = GPIO::door_start_status::closed_at_least_once;
+
             // reset the conditional once the door is closed
             has_been_sent = false;
         }
@@ -127,4 +116,44 @@ GPIOController* GPIOController::configure_pins()
     pullUpDnControl(door_sensor_pin, GPIO::pull_codes.at("pull_up"));
 
     return this;
+}
+
+GPIOController* GPIOController::manage_door_start_status(bool is_door_open)
+{
+    if(door_start_status == GPIO::door_start_status::first_iteration)
+    {
+        door_start_status = is_door_open ?
+                    GPIO::door_start_status::started_open :
+                    GPIO::door_start_status::closed_at_least_once;
+    }
+}
+
+GPIOController* GPIOController::manage_sending_msg() const
+{
+    // don't send if door is open, but it started open
+    // only send 1 msg per door opening
+    if(has_been_sent == false and door_start_status != GPIO::door_start_status::started_open)
+    {
+        if(is_verbose)
+        {
+            std::unique_lock<std::mutex> lck(mtx);
+            cout << "Sending notification packet that door has opened" << endl;
+            lck.unlock();
+        }
+
+        UDPSender sender(destination.port, destination.ip, is_verbose);
+        sender.send_msg("Door Opened");
+        has_been_sent = true;
+    }
+}
+
+bool GPIOController::is_handshake_completed() const
+{
+    bool res = true;
+    // fail if port still garabge value
+    res &= destination.port != COMM::GARBAGE_SERVER_PORT;
+
+    // When compare == 0, strings are the same (still garbage)
+    res &= destination.ip.compare(COMM::GARBAGE_SERVER_IP) != 0;
+    return res;
 }

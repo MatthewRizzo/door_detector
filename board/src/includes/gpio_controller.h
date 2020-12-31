@@ -62,10 +62,31 @@ class GPIOController
          */
         bool read_door_sensor() const;
 
+        /**
+         * @brief Only makes changes onn first iteration of while loop after handshake is completed.
+         *      \n Sets door_start_status to open or closed depending on its current status.
+         *      \n Only changes door_start_status if it started open but closed afterwards.
+         */
+        GPIOController* manage_door_start_status(bool is_door_open);
+
+        /**
+         * @brief Helper to wrap the sending of the msg when applicable
+         */
+        GPIOController* manage_sending_msg() const;
+
+        /**
+         * @brief If handshake has been completed at least once, destination's values will not be garbage,
+         *       and the sensor can be checked.
+         */
+        bool is_handshake_completed() const;
+
         // Member variables
         bool is_verbose;
         int door_sensor_pin;
-        bool has_been_sent; // ensures no duplicate sends for the same opening
+        mutable bool has_been_sent; // ensures no duplicate sends for the same opening
+
+        // If door starts open, don't send a msg until it opens again after being closed
+        GPIO::door_start_status door_start_status;
 
         ServerInfo destination;
 
