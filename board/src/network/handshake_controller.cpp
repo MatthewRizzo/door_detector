@@ -15,8 +15,10 @@ HandshakeController::~HandshakeController()
 
 void HandshakeController::run_setup_receiver()
 {
+    std::unique_lock<std::mutex> lck(mtx);
     cout << "Waiting for server to send a msg on port " << get_recv_port();
     cout << " and ip " << get_board_ip() << endl;
+    lck.unlock();
     set_continue_receiving(true);
     while(get_continue_receiving() == true)
     {

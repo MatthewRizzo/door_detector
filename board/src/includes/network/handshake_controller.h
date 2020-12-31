@@ -4,6 +4,7 @@
 
 // 3rd party includes
 #include <json.hpp>
+#include <mutex>
 
 // project defined includes
 #include "comm_utils.h"
@@ -27,6 +28,9 @@ class HandshakeController : public RecvHandshake, public ConfirmHandshake
         virtual ~HandshakeController();
 
         void run_setup_receiver() override;
+
+    private:
+        std::mutex mtx;
 
 }; // end of HandshakeController
 
