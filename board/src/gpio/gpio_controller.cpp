@@ -5,7 +5,7 @@ GPIOController::GPIOController(HandshakeController* handshake):
     is_verbose(GPIO::DEFAULT_VERBOSITY),
     door_sensor_pin(GPIO::DEFAULT_DOOR_SENSOR_PIN),
     has_been_sent(false),
-    destination(-1, "-1"),
+    destination(), // use default constructor to get garbage values
     handshake(handshake)
 {
     // The thread should default to not running
@@ -36,12 +36,18 @@ void GPIOController::run_door_thread()
         set_server_info(handshake->get_server_config());
 
         // Only run the thread if they are non-default garbage values
-        if(destination.port == COMM::GARBAGE_SERVER_PORT || destination.ip.compare(COMM::GARBAGE_SERVER_IP) != 0)
+        // When compare == 0, strings are the same (still garbage)
+        if(destination.port == COMM::GARBAGE_SERVER_PORT || destination.ip.compare(COMM::GARBAGE_SERVER_IP) == 0)
         {
             continue;
         }
+
         if(read_door_sensor())
         {
+            std::unique_lock<std::mutex> lck(mtx);
+            cout << "DEBUG: door detected as opened" << endl;
+            lck.unlock();
+
             // only send 1 msg per door opening
             if(has_been_sent == false)
             {
@@ -49,6 +55,7 @@ void GPIOController::run_door_thread()
                 {
                     std::unique_lock<std::mutex> lck(mtx);
                     cout << "Sending notification packet that door has opened" << endl;
+                    lck.unlock();
                 }
 
                 UDPSender sender(destination.port, destination.ip, is_verbose);
@@ -105,6 +112,9 @@ GPIOController* GPIOController::set_door_sensor_pin(int pin_num)
 bool GPIOController::read_door_sensor() const
 {
     int status = digitalRead(door_sensor_pin);
+    std::unique_lock<std::mutex> lck(mtx);
+    cout << "DEBUG: door status = " << status << endl;
+    lck.unlock();
     GPIO::door_status_codes converted_status = static_cast<GPIO::door_status_codes>(status);
     return converted_status == GPIO::door_status_codes::open;
 }

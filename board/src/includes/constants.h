@@ -37,7 +37,6 @@ namespace COMM
 {
     const bool DEFAULT_VERBOSITY            {false};
 
-    constexpr int DEFAULT_SERVER_PORT       {55555}; // used when sending to server
     constexpr int DATA_BUFFER_SIZE          {1024};
 
 

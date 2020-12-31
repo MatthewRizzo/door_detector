@@ -1,11 +1,9 @@
 #include "handshake_base.h"
 
 HandshakeBase::HandshakeBase():
+    server_config(),
     board_ip(CommUtil::get_public_ip())
 {
-
-    server_config.ip = "";
-    server_config.port = COMM::DEFAULT_SERVER_PORT;
 
     // dont actually start the thread until requested
     continue_receiving.store(false);
