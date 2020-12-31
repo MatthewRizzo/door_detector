@@ -72,7 +72,7 @@ class GPIOController
         /**
          * @brief Helper to wrap the sending of the msg when applicable
          */
-        GPIOController* manage_sending_msg() const;
+        void manage_sending_msg() const;
 
         /**
          * @brief If handshake has been completed at least once, destination's values will not be garbage,

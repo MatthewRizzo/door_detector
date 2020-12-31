@@ -126,9 +126,10 @@ GPIOController* GPIOController::manage_door_start_status(bool is_door_open)
                     GPIO::door_start_status::started_open :
                     GPIO::door_start_status::closed_at_least_once;
     }
+    return this;
 }
 
-GPIOController* GPIOController::manage_sending_msg() const
+void GPIOController::manage_sending_msg() const
 {
     // don't send if door is open, but it started open
     // only send 1 msg per door opening
