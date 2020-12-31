@@ -19,7 +19,7 @@ def clear_queue(q: Queue):
 
 program_ended = False
 
-
+# TODO: Refactor / move this into another class
 def wait_for_board(server: Server, client_data: Queue) -> str:
     """Blocking function to wait for ping from the board i.e. that door has opened.
     \nreturn The msg sent from board on success, None otherwise"""

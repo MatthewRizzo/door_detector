@@ -38,7 +38,7 @@ class Server(Thread):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
         sock.bind((udp_ip, self._run_port))
-        print("------------------------\n\nCommuncation Protocal Established")
+        print("Communcation Protocal Established\n------------------------\n\n")
         print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._run_port}. hostname = {hostname}")
 
         # Wait for a connection
