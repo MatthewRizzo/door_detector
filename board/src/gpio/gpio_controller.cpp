@@ -36,9 +36,8 @@ void GPIOController::run_door_thread()
         set_server_info(handshake->get_server_config());
 
         // Only run the thread if they are non-default garbage values
-        if(destination.port == COMM::GARBAGE_SERVER_PORT || destination.ip == COMM::GARBAGE_SERVER_IP)
+        if(destination.port == COMM::GARBAGE_SERVER_PORT || destination.ip.compare(COMM::GARBAGE_SERVER_IP) != 0)
         {
-            cout << "destination port and ip still garbage" << endl;
             continue;
         }
         if(read_door_sensor())
