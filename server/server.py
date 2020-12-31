@@ -23,7 +23,6 @@ class Server(Thread):
         # Threading related defines
         Thread.__init__(self)
         self.thread_status = threading.Event() # True when thread not running
-        Server.set_run_port(udp_port)
         self.received_msg = False
         self._data_queue = data_queue
 

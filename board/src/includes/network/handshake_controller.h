@@ -32,6 +32,9 @@ class HandshakeController : public RecvHandshake, public ConfirmHandshake
     private:
         std::mutex mtx;
 
+        // use this to keep track if an update trully happened
+        ServerInfo prev_server_val;
+
 }; // end of HandshakeController
 
 #endif
