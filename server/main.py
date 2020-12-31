@@ -46,6 +46,9 @@ if __name__ == "__main__":
     parser = Parser()
     args = parser.args
 
+    # Set values obtained from parser (where applicable)
+    Server.set_run_port(args.server_run_port)
+
     server = None
 
     # Will store data, addr after recvfrom

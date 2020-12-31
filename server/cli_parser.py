@@ -20,6 +20,8 @@ class Parser():
                                 type=int, default=constants.BOARD_HANDSHAKE_RECV_PORT)
         client_args.add_argument('-n','--client_hostname', type=str, default=constants.BOARD_HOSTNAME,
                                 help="Use to select the hostname of the client (connected to the sensor)")
+        self.parser.add_argument("-p,--server_run_port", type=int, default=constants.DEFAULT_RUN_PORT,
+                                help="Use this to set the port the client (board) will send notifications to")
 
     def parse(self):
         self.args = self.parser.parse_args()

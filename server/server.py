@@ -18,7 +18,7 @@ class Server(Thread):
     """Class responsible for handling all communication's to/from client on the server machine.
     \nKeyword arguments:
     \nport -- The port number to wait for a connection on """
-    _udp_port =  50001
+    _run_port =  50001
     def __init__(self, data_queue: Queue, udp_port: int = 50001):
         # Threading related defines
         Thread.__init__(self)
@@ -38,9 +38,9 @@ class Server(Thread):
                             socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
-        sock.bind((udp_ip, self._udp_port))
+        sock.bind((udp_ip, self._run_port))
         print("------------------------\n\nCommuncation Protocal Established")
-        print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._udp_port}. hostname = {hostname}")
+        print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._run_port}. hostname = {hostname}")
 
         # Wait for a connection
         while not self.thread_status.isSet() and self.received_msg is False:
@@ -141,12 +141,12 @@ class Server(Thread):
 
 
     @classmethod
-    def get_port(cls):
-        return cls._udp_port
+    def get_run_port(cls):
+        return cls._run_port
 
     @classmethod
-    def set_port(cls, new_port):
-        cls._udp_port = new_port
+    def set_run_port(cls, new_port):
+        cls._run_port = new_port
 
     @classmethod
     def translate_socket_dict(cls, data: dict) -> str:
