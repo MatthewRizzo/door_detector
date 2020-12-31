@@ -43,14 +43,14 @@ void GPIOController::run_door_thread()
         }
         if(read_door_sensor())
         {
-            if(is_verbose)
-            {
-                cout << "Sending notification packet that door has opened" << endl;
-            }
-
             // only send 1 msg per door opening
             if(has_been_sent == false)
             {
+                if(is_verbose)
+                {
+                    cout << "Sending notification packet that door has opened" << endl;
+                }
+
                 UDPSender sender(destination.port, destination.ip, is_verbose);
                 sender.send_msg("Door Opened");
                 has_been_sent = true;
