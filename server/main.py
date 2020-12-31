@@ -13,8 +13,6 @@ from server import Server
 from notification import Notification
 from cli_parser import Parser
 
-udp_port = 52160
-
 def clear_queue(q: Queue):
     while not q.empty:
         q.get()
@@ -70,7 +68,7 @@ if __name__ == "__main__":
 
     #TODO: wait for response from send_handshake and save info
     if program_ended is False:
-        server = Server(client_data, udp_port)
+        server = Server(client_data)
         server.start() # Startup the server
 
     # Constantly wait for a msg that the door has been opened from the board

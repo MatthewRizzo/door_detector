@@ -19,11 +19,11 @@ class Server(Thread):
     \nKeyword arguments:
     \nport -- The port number to wait for a connection on """
     _run_port =  50001
-    def __init__(self, data_queue: Queue, udp_port: int = 50001):
+    def __init__(self, data_queue: Queue):
         # Threading related defines
         Thread.__init__(self)
         self.thread_status = threading.Event() # True when thread not running
-        Server.set_port(udp_port)
+        Server.set_run_port(udp_port)
         self.received_msg = False
         self._data_queue = data_queue
 
@@ -107,7 +107,7 @@ class Server(Thread):
         hostname = data_dict['hostname']
 
         # give board hostname, ip, port
-        data_json = {'host' : hostname, 'ip' : ip, 'port' : Server.get_port()}
+        data_json = {'host' : hostname, 'ip' : ip, 'port' : Server.get_run_port()}
         board_ip = socket.gethostbyname(client_hostname)
         msg = f"Sending msg to ip {board_ip} and port {board_handshake_recv_port}."
         msg += " Will keep trying until a reponse is received."
