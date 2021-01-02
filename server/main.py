@@ -31,7 +31,7 @@ def wait_for_board(server: Server, client_data: Queue) -> str:
             socket_response_dict = client_data.get(block=False)
             print(Server.translate_socket_dict(socket_response_dict))
             clear_queue(client_data)
-        server.join()
+        server.stop_thread()
 
     return socket_response_dict['data'] # None unless a msg received
 
@@ -59,10 +59,9 @@ if __name__ == "__main__":
     handshake = Handshake(args)
     handshake.perform_handshake()
 
-    #TODO: wait for response from send_handshake and save info
-    if program_ended is False:
-        server = Server(client_data)
-        server.start() # Startup the server
+    # Startup the server
+    server = Server(client_data)
+    server.start()
 
     # Constantly wait for a msg that the door has been opened from the board
     while True and program_ended is False:
@@ -71,6 +70,12 @@ if __name__ == "__main__":
         if data is not None:
             # Alert user whenever it gets a msg
             notif.alert()
+
+            # once the alert is clicked, reset the server run
+            server = None
+            server = Server(client_data)
+            server.start()
+
 
     # Kill the server thread
     if server is not None:

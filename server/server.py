@@ -14,7 +14,7 @@ import time
 import constants
 
 class Server(Thread):
-    got_response = False
+    got_handshake_response = False
     """Class responsible for handling all communication's to/from client on the server machine.
     \nKeyword arguments:
     \nport -- The port number to wait for a connection on """
@@ -41,8 +41,8 @@ class Server(Thread):
         print("Communcation Protocal Established\n------------------------\n\n")
         print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._run_port}. hostname = {hostname}")
 
-        # Wait for a connection
-        while not self.thread_status.isSet() and self.received_msg is False:
+        # Wait for a ping from board
+        while not self.thread_status.is_set() and self.received_msg is False:
             try:
                 raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
                 data = raw_data.decode()
@@ -60,7 +60,6 @@ class Server(Thread):
     def stop_thread(self):
         """ Handles the end of the thread by setting and joining"""
         self.thread_status.set()
-        self._stop_thread = True
 
     # Class methods to handle multicasting / multicasting to Pi
     @classmethod
@@ -112,7 +111,7 @@ class Server(Thread):
         msg += " Will keep trying until a reponse is received."
         print(msg)
 
-        while cls.got_response is False:
+        while cls.got_handshake_response is False:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(.2)
             try:
@@ -124,9 +123,9 @@ class Server(Thread):
     @classmethod
     def confirm_handshake(cls):
         """BLOCKING - CALL IN THREAD. During setup of communications, waits for response from the board.
-        modifies cls.got_response when it does"""
+        modifies cls.got_handshake_response when it does"""
         print(f"Starting confirm setup thread. Waits on port {constants.CONFIRMATION_WAIT_PORT}")
-        while cls.got_response is False:
+        while cls.got_handshake_response is False:
             recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
             recv_sock.bind((Server.get_cur_hostname_IP()['ip'], constants.CONFIRMATION_WAIT_PORT))
             recv_sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
@@ -154,10 +153,10 @@ class Server(Thread):
         msg = []
         for key, val in data.items():
             msg.append(f"{key}: {val}")
-        return '\n'.join(msg)
+        return '\n'.join(msg) + '\n'
 
     @classmethod
-    def set_got_reponse(cls, new_got_response: bool = True):
+    def set_got_reponse(cls, new_got_handshake_response: bool = True):
         """Sets the class variable governing if send_handshake has received a response or not.
         When set to True, the send_handshake and wait for confirmation loops end"""
-        cls.got_response = new_got_response
+        cls.got_handshake_response = new_got_handshake_response
