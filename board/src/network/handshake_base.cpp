@@ -1,8 +1,6 @@
 #include "handshake_base.h"
 
 HandshakeBase::HandshakeBase():
-    // instantiating this here means no one else in diamond inheritence will have to
-    ThreadUtils(),
     server_config(),
     board_ip(CommUtil::get_public_ip())
 {
