@@ -8,9 +8,13 @@ import signal
 import sys
 from threading import Thread
 
+# Add subdirs to project path
+sys.path.append("network/")
+
 # project includes
-from handshake import Handshake
-from server import Server
+# from handshake import Handshake
+from network.handshake import Handshake
+from network.server import Server
 from notification import Notification
 from cli_parser import Parser
 
@@ -39,7 +43,8 @@ def signal_handler(sig, frame):
     print("Caught ctrl+c: ")
     global program_ended
     program_ended = True
-    Server.set_got_reponse()
+    Handshake.set_got_reponse()
+    Server.set_got_msg()
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
@@ -66,7 +71,6 @@ if __name__ == "__main__":
     # Constantly wait for a msg that the door has been opened from the board
     while True and program_ended is False:
         data = wait_for_board(server, client_data)
-
         if data is not None:
             # Alert user whenever it gets a msg
             notif.alert()
