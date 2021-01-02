@@ -11,6 +11,7 @@ target_link_libraries(main_driver
     GPIO_Controller
     HANDSHAKE
     COMMS
+    THREAD_UTILS
 )
 
 target_compile_options(main_driver

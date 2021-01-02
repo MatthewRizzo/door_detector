@@ -34,16 +34,13 @@ void ConfirmHandshake::respond_to_server()
     send_dest.sin_port = htons(get_send_confirm_port());
     if(get_verbosity() == true)
     {
-        cout << "Acknowledging setup completion by sending ACK to server (computer)";
-        cout << " port " << get_send_confirm_port() << " and IP: " << get_server_ip() << endl;
+        std::string msg = "Acknowledging setup completion by sending ACK to server (computer)";
+        msg += " port " + std::to_string(get_send_confirm_port()) + " and IP: " +  get_server_ip();
+        thread_print(msg, true);
     }
     if(sendto(response_sock_fd, (const char*) send_buf, sizeof(send_buf), 0, (sockaddr *) &send_dest, sizeof(send_dest)) < 0)
     {
         cout << "ERROR: sending response packet confirming setup" << endl;
     }
     close(response_sock_fd);
-    if(get_verbosity() == true)
-    {
-        cout << "---------------------------------" << endl << endl;
-    }
 }

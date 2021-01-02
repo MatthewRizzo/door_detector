@@ -9,6 +9,7 @@ import sys
 from threading import Thread
 
 # project includes
+from handshake import Handshake
 from server import Server
 from notification import Notification
 from cli_parser import Parser
@@ -55,17 +56,8 @@ if __name__ == "__main__":
 
     notif = Notification()
 
-    # Setup the board by giving the port and ip on this machine (server) to send messages to
-    setup_thread = Thread(target = Server.send_handshake, args=(args.client_hostname, args.client_handshake_port))
-
-    # Wait for the client (board) to confirm recepit of setup packet
-    confirm_thread = Thread(target = Server.confirm_handshake)
-
-    setup_thread.start()
-    confirm_thread.start()
-
-    setup_thread.join()
-    confirm_thread.join()
+    handshake = Handshake(args)
+    handshake.perform_handshake()
 
     #TODO: wait for response from send_handshake and save info
     if program_ended is False:
@@ -88,7 +80,3 @@ if __name__ == "__main__":
         server = None
 
     sys.exit(1)
-
-# To test, run main and the following command in a terminal:
-# nc -u 192.168.1.220 52160
-# nc -u MATT-ROG-LAPTOP 52160 #TODO: get this to work with new hostname

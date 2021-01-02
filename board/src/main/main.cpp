@@ -59,13 +59,15 @@ int main(int argc, char* argv[])
     tvec threads;
 
     // Handshake to setup comms - set variables from flags
-    handshake.set_verbosity(parse_res["v_setup"])
+    handshake.set_handshake_cooldown((int64_t) std::stoi(parse_res["cooldown"]))
+        ->set_verbosity(parse_res["v_setup"])
         ->set_recv_setup_port(std::stoi(parse_res["sr_port"]))
         ->set_send_confirm_port(std::stoi(parse_res["ss_port"]));
 
+
     // Set gpio variables from flags
-    gpio.set_verbosity(parse_res["v_gpio"])
-        ->set_door_sensor_pin(std::stoi(parse_res["door_sensor_pin"]));
+    gpio.set_door_sensor_pin(std::stoi(parse_res["door_sensor_pin"]))
+        ->set_verbosity(parse_res["v_gpio"]);
 
     // Commented out for now to focus on GPIO code
     threads.push_back(std::thread(&HandshakeController::run_setup_receiver, std::ref(handshake)));

@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <cstddef>
 #include <map>
 #include <string>
 
@@ -26,6 +27,7 @@ namespace CLI::ParseMetaData
     const std::string SETUP_RECV_PORT    {"sr_port"};
     const std::string SETUP_SEND_PORT    {"ss_port"};
     const std::string VERBOSE_SETUP      {"v_setup"};
+    const std::string HANDSHAKE_COOLDOWN {"cooldown"};
 
     // Related to GPIO
     const std::string VERBOSE_GPIO       {"v_gpio"};
@@ -36,9 +38,9 @@ namespace CLI::ParseMetaData
 namespace COMM
 {
     const bool DEFAULT_VERBOSITY            {false};
+    constexpr int64_t HANDSHAKE_COOLDOWN      {2000}; // msec
 
     constexpr int DATA_BUFFER_SIZE          {1024};
-
 
     constexpr int TIMEOUT_SEC               {10}; // Used for heartbeat on sockets
     constexpr int TIMEOUT_MILLISEC          {0};

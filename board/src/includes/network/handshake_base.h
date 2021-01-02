@@ -18,6 +18,7 @@
 #include "comm_utils.h"
 #include "constants.h"
 #include "json_utils.h"
+#include "thread_utils.h"
 #include "udp_sender.h"
 
 
@@ -27,7 +28,7 @@ using std::cerr;
 
 using json = nlohmann::json;
 
-class HandshakeBase
+class HandshakeBase : public ThreadUtils
 {
     public:
             /**

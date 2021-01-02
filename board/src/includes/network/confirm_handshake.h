@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <iostream>
 #include <string.h> // used by memset
+#include <string>
 #include <mutex> // mutex and unique_lock
 #include <thread>
 #include <netinet/in.h> // used by sockaddr_in

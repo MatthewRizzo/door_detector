@@ -71,6 +71,12 @@ void CLI_parser::setup_flags()
         ->required(false)
         ->default_val(GPIO::DEFAULT_DOOR_SENSOR_PIN);
 
+    add_option("-c,--handshake_cooldownn",
+            cli_results[CLI::ParseMetaData::HANDSHAKE_COOLDOWN])
+        ->description("Time (in milliseconds) to wait between handshakes")
+        ->required(false)
+        ->default_val(COMM::HANDSHAKE_COOLDOWN);
+
     // bool flags
 
     add_flag("-k,--setup_verbose",

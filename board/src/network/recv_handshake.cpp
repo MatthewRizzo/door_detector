@@ -108,7 +108,8 @@ std::pair<struct ServerInfo, bool> RecvHandshake::rcv_msg(int recv_sock_fd)
     }
     if(get_verbosity() == true)
     {
-        cout << "Received Setup Message: " << std::string(data_buffer) << endl;
+        std::string msg = "Received Setup Message: " + std::string(data_buffer);
+        ThreadUtils::thread_print(msg, true);
     }
     parse_msg(std::string(data_buffer), sender_socket_info);
     return std::make_pair(sender_socket_info, true);
