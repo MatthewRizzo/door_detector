@@ -26,6 +26,21 @@ class Server(Thread):
         self.received_msg = False
         self._data_queue = data_queue
 
+    def wait_for_board(self, client_data: Queue) -> str:
+        """Blocking function to wait for ping from the board i.e. that door has opened.
+        \nreturn The msg sent from board on success, None otherwise"""
+        socket_response_dict = {'data':None}
+        # Only check queue if thread set - got a response from board
+        if self.received_msg is True:
+            if not client_data.empty():
+                socket_response_dict = client_data.get(block=False)
+                print(Server.translate_socket_dict(socket_response_dict))
+                self.clear_queue(client_data)
+            self.stop_thread()
+
+        return socket_response_dict['data'] # None unless a msg received
+
+
     def run(self):
         """Handle the start of the thread and its waiting for communication
         \nOverload run function of Thread for this thread class. Gets called by start()."""
@@ -61,6 +76,12 @@ class Server(Thread):
         """ Handles the end of the thread by setting and joining"""
         self.thread_status.set()
 
+
+    def clear_queue(self, q: Queue):
+        """Util Function
+        """
+        while not q.empty:
+            q.get()
     @classmethod
     def get_run_port(cls):
         return cls._run_port

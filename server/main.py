@@ -12,32 +12,12 @@ from threading import Thread
 sys.path.append("network/")
 
 # project includes
-# from handshake import Handshake
 from network.handshake import Handshake
 from network.server import Server
 from notification import Notification
 from cli_parser import Parser
 
-def clear_queue(q: Queue):
-    while not q.empty:
-        q.get()
-
 program_ended = False
-
-# TODO: Refactor / move this into another class
-def wait_for_board(server: Server, client_data: Queue) -> str:
-    """Blocking function to wait for ping from the board i.e. that door has opened.
-    \nreturn The msg sent from board on success, None otherwise"""
-    socket_response_dict = {'data':None}
-    # Only check queue if thread set - got a response from board
-    if server.received_msg is True:
-        if not client_data.empty():
-            socket_response_dict = client_data.get(block=False)
-            print(Server.translate_socket_dict(socket_response_dict))
-            clear_queue(client_data)
-        server.stop_thread()
-
-    return socket_response_dict['data'] # None unless a msg received
 
 def signal_handler(sig, frame):
     print("Caught ctrl+c: ")
@@ -70,7 +50,7 @@ if __name__ == "__main__":
 
     # Constantly wait for a msg that the door has been opened from the board
     while True and program_ended is False:
-        data = wait_for_board(server, client_data)
+        data = server.wait_for_board(client_data)
         if data is not None:
             # Alert user whenever it gets a msg
             notif.alert()
