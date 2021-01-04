@@ -15,15 +15,16 @@ import constants
 from network.network_utils import NetworkUtils
 
 class Server(Thread):
-    got_msg = False
     """Class responsible for handling all communication's to/from client on the server machine.
     """
+    received_msg = False
     _run_port =  50001
     def __init__(self, data_queue: Queue):
         # Threading related defines
         Thread.__init__(self)
         self.thread_status = threading.Event() # True when thread not running
-        self.received_msg = False
+        Server.received_msg = False
+
         self._data_queue = data_queue
 
     def wait_for_board(self, client_data: Queue) -> str:
@@ -31,7 +32,7 @@ class Server(Thread):
         \nreturn The msg sent from board on success, None otherwise"""
         socket_response_dict = {'data':None}
         # Only check queue if thread set - got a response from board
-        if self.received_msg is True:
+        if Server.received_msg is True:
             if not client_data.empty():
                 socket_response_dict = client_data.get(block=False)
                 print(Server.translate_socket_dict(socket_response_dict))
@@ -53,11 +54,10 @@ class Server(Thread):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
         sock.bind((udp_ip, self._run_port))
-        print("Communcation Protocal Established\n------------------------\n\n")
         print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._run_port}. hostname = {hostname}")
 
         # Wait for a ping from board
-        while not self.thread_status.is_set() and self.received_msg is False:
+        while not self.thread_status.is_set() and Server.received_msg is False:
             try:
                 raw_data, raw_addr = sock.recvfrom(1024) # buffer size is 1024 bytes
                 data = raw_data.decode()
@@ -66,7 +66,7 @@ class Server(Thread):
                 data_dict = {'data': data.strip(), 'board_ip': board_ip_addr, 'client_port': client_port}
                 self._data_queue.put(data_dict)
 
-                self.received_msg = True
+                Server.received_msg = True
             except:
                 # If no msg received, just start loop again
                 pass
@@ -103,6 +103,6 @@ class Server(Thread):
     def set_got_msg(cls, new_got_msg: bool = True):
         """Sets the class variable governing if send_handshake has received a response or not.
         When set to True, the send_handshake and wait for confirmation loops end"""
-        cls.got_msg = new_got_msg
+        cls.received_msg = new_got_msg
 
 

@@ -19,6 +19,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+
 class GPIOController
 {
     public:
@@ -43,6 +44,7 @@ class GPIOController
         GPIOController* set_server_info(ServerInfo info);
         GPIOController* set_verbosity(std::string is_verbose);
         GPIOController* set_door_sensor_pin(int pin_num);
+        GPIOController* set_door_closing_duration(double duration);
 
         /**
          * @return The atomic variable - if true the thread is running
@@ -80,10 +82,23 @@ class GPIOController
          */
         bool is_handshake_completed() const;
 
+        /**
+         * @brief Used to ensure that the closing of the door does not accidentally trigger a door open message.
+         *      In effect, creates a debounce / cooldown on the sensor between state transitions.
+         * @param door_opened true if the most recent sensor had the door as opened
+         * @return True if the door is closing and the sensor state should be ignored. false otherwise.
+         */
+        bool ignore_sensor_state(bool door_opened);
+
         // Member variables
         bool is_verbose;
         int door_sensor_pin;
         mutable bool has_been_sent; // ensures no duplicate sends for the same opening
+
+        // Used to control flow from open -> closed
+        GPIO::door_status_codes prev_door_pos;
+        std::chrono::_V2::system_clock::time_point door_closing_start_time; // used as relative time for ignoring period
+        double closing_duration;
 
         // If door starts open, don't send a msg until it opens again after being closed
         GPIO::door_start_status door_start_status;

@@ -5,6 +5,7 @@ GPIOController::GPIOController(HandshakeController* handshake):
     is_verbose(GPIO::DEFAULT_VERBOSITY),
     door_sensor_pin(GPIO::DEFAULT_DOOR_SENSOR_PIN),
     has_been_sent(false),
+    prev_door_pos(GPIO::door_status_codes::unknown),
     door_start_status(GPIO::door_start_status::first_iteration),
     destination(), // use default constructor to get garbage values
     handshake(handshake)
@@ -44,6 +45,8 @@ void GPIOController::run_door_thread()
         // check if door started open (only on first iteration of loop)
         manage_door_start_status(door_opened);
 
+        if(ignore_sensor_state(door_opened)) {continue;}
+
         if(door_opened)
         {
             manage_sending_msg();
@@ -55,6 +58,42 @@ void GPIOController::run_door_thread()
             // reset the conditional once the door is closed
             has_been_sent = false;
         }
+    }
+}
+
+bool GPIOController::ignore_sensor_state(bool door_opened)
+{
+    // compare last state to now. add debounce if went from open to closed
+    if(     prev_door_pos == GPIO::door_status_codes::open && !door_opened)
+    {
+        prev_door_pos = GPIO::door_status_codes::closing;
+
+        // Start the timer where the doors state will be ignored
+        // Ends when the door is considered completly closed
+        door_closing_start_time = std::chrono::system_clock::now();
+        return true; // ignore the sensor
+    }
+    else if (prev_door_pos == GPIO::door_status_codes::closing)
+    {
+        // check if enough time has elapsed
+        const auto cur_time = std::chrono::system_clock::now();
+        const std::chrono::duration<double, std::milli> time_diff = cur_time - door_closing_start_time;
+        const double time_diff_milli_sec = time_diff.count();
+
+        // ignore sensor if still closing
+        if (closing_duration > time_diff_milli_sec)
+        {
+            return true; // ignore the sensor
+        }
+        else
+        {
+            prev_door_pos =  GPIO::door_status_codes::closed;
+            return false; // door is closed, don't ignore sensor
+        }
+    }
+    else{
+        prev_door_pos = door_opened ? GPIO::door_status_codes::open : GPIO::door_status_codes::closed;
+        return false; // door is not closing, don't ignore sensor
     }
 }
 
@@ -95,6 +134,12 @@ GPIOController* GPIOController::set_door_sensor_pin(int pin_num)
 
     // update pin configuration
     return configure_pins();
+}
+
+GPIOController* GPIOController::set_door_closing_duration(double duration)
+{
+    closing_duration = duration;
+    return this;
 }
 
 bool GPIOController::read_door_sensor() const

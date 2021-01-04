@@ -67,7 +67,8 @@ int main(int argc, char* argv[])
 
     // Set gpio variables from flags
     gpio.set_door_sensor_pin(std::stoi(parse_res["door_sensor_pin"]))
-        ->set_verbosity(parse_res["v_gpio"]);
+        ->set_verbosity(parse_res["v_gpio"])
+        ->set_door_closing_duration(std::stod(parse_res["close_duration"]));
 
     // Commented out for now to focus on GPIO code
     threads.push_back(std::thread(&HandshakeController::run_setup_receiver, std::ref(handshake)));

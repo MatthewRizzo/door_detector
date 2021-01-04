@@ -32,6 +32,7 @@ namespace CLI::ParseMetaData
     // Related to GPIO
     const std::string VERBOSE_GPIO       {"v_gpio"};
     const std::string DOOR_SENSOR_PIN    {"door_sensor_pin"};
+    const std::string CLOSING_DURATION   {"close_duration"};
 
 }; // end of parse namespace for CLI
 
@@ -86,7 +87,12 @@ namespace GPIO
         // door is closed -> sensors together -> read a 0 = low
         closed    = LOW,
         open      = HIGH,
+        unknown   = -1, // Used for when position is unknown
+        closing   = 100 // Used when door is in the process of closing
     };
+
+    // Used to control how long sesnor state is ignored during door closing
+    constexpr int64_t DEFAULT_CLOSING_PERIOD  {500}; // milliseconds
 
     enum class door_start_status
     {

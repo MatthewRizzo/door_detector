@@ -39,9 +39,11 @@ class Handshake(Thread):
         setup_thread.start()
         confirm_thread.start()
 
-        # Have the threads die as soon as possible
+        # # Have the threads die as soon as possible
         setup_thread.join()
         confirm_thread.join()
+
+        print("Communcation Protocal Established\n------------------------\n\n")
 
     @classmethod
     def send_handshake(cls, client_hostname, board_handshake_recv_port, server_run_port):

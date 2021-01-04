@@ -77,8 +77,13 @@ void CLI_parser::setup_flags()
         ->required(false)
         ->default_val(COMM::HANDSHAKE_COOLDOWN);
 
-    // bool flags
+    add_option("-u,--closing_duration",
+            cli_results[CLI::ParseMetaData::CLOSING_DURATION])
+        ->description("Time (in milliseconds) to ignore sensor readings while door is closing")
+        ->required(false)
+        ->default_val(GPIO::DEFAULT_CLOSING_PERIOD);
 
+    // bool flags
     add_flag("-k,--setup_verbose",
             cli_results[CLI::ParseMetaData::VERBOSE_SETUP])
         ->description("Use this to make comms Setup more verbose.")
