@@ -1,11 +1,13 @@
 # C++ Related ignores
 # Cmake build folder
 */build/
+
 # Cmake stores binaries here
 */bin
 
 # Python related ignores
 __pycache__/
+*/static
 
 # VS code related ignores
 .vscode/

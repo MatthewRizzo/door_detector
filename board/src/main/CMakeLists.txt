@@ -9,7 +9,9 @@ target_link_libraries(main_driver
     CLI_CONTROLLER
     JSON_UTILS
     GPIO_Controller
-    NETWORK
+    HANDSHAKE
+    COMMS
+    THREAD_UTILS
 )
 
 target_compile_options(main_driver

@@ -8,80 +8,64 @@ import signal
 import sys
 from threading import Thread
 
+# Add subdirs to project path
+sys.path.append("network/")
+
 # project includes
-from server import Server
+from network.handshake import Handshake
+from network.server import Server
 from notification import Notification
-
-udp_port = 52160
-
-def clear_queue(q: Queue):
-    while not q.empty:
-        q.get()
+from cli_parser import Parser
 
 program_ended = False
-
-
-def wait_for_board(server: Server, client_data: Queue) -> str:
-    """Blocking function to wait for ping from the board i.e. that door has opened.
-    \nreturn The msg sent from board on success, None otherwise"""
-    socket_response_dict = {'data':None}
-    # Only check queue if thread set - got a response from board
-    if server.received_msg is True:
-        socket_response_dict = client_data.get(block=False)
-        print(Server.translate_socket_dict(socket_response_dict))
-        clear_queue(client_data)
-        server.join()
-
-    return socket_response_dict['data'] # None unless a msg received
 
 def signal_handler(sig, frame):
     print("Caught ctrl+c: ")
     global program_ended
     program_ended = True
-    Server.set_got_reponse()
+    Handshake.set_got_reponse()
+    Server.set_got_msg()
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
+    parser = Parser()
+    args = parser.args
+
+    # Set values obtained from parser (where applicable)
+    Server.set_run_port(args.server_run_port)
+
+    server = None
 
     # Will store data, addr after recvfrom
     client_data = Queue()
 
     notif = Notification()
 
-    # Setup the board by giving the port and ip on this machine (server) to send messages to
-    setup_thread = Thread(target = Server.setup_board)
+    handshake = Handshake(args)
+    handshake.perform_handshake()
 
-    # Wait for the client (board) to confirm recepit of setup packet
-    confirm_thread = Thread(target = Server.confirm_board_setup)
-
-    setup_thread.start()
-    confirm_thread.start()
-
-    setup_thread.join()
-    confirm_thread.join()
-
-    #TODO: wait for response from setup_board and save info
-    if program_ended is False:
-        server = Server(client_data, udp_port)
-        server.start() # Startup the server
+    # Startup the server
+    server = Server(client_data)
+    server.start()
 
     # Constantly wait for a msg that the door has been opened from the board
     while True and program_ended is False:
-        data = wait_for_board(server, client_data)
-
+        data = server.wait_for_board(client_data)
         if data is not None:
             # Alert user whenever it gets a msg
             notif.alert()
 
+            # once the alert is clicked, reset the server run
+            server = None
+            server = Server(client_data)
+            server.start()
+
 
     # Kill the server thread
-    server.stop_thread()
-    server.join()
-    print("Done with join for server")
-    server = None
+    if server is not None:
+        server.stop_thread()
+        server.join()
+        print("Done with join for server")
+        server = None
 
     sys.exit(1)
-
-# To test, run main and the following command in a terminal:
-# nc -u 192.168.1.220 52160
-# nc -u MATT-ROG-LAPTOP 52160 #TODO: get this to work with new hostname
