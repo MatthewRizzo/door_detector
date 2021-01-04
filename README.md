@@ -46,6 +46,7 @@ This binary will manage:
     - When program is running, waits for reciept of a packet from the client.
     - On reciept, triggers a basic popup or notification on laptop that door has been opened
     - **Currently, must be run on Windows for graphical aspect of tkinter**
+        - TODO: next branch / implementation will move from tkinter to web apps, so it can run agnostic to OS... basically moving to Linux or WSL
 
 **Note:** All client-side code will be written in a completely seperate directory than server-side.
 This is because the client-side code will need to be compiled and run without interaction from server-side.
@@ -67,7 +68,7 @@ Folder structure
 
 - MC-38 Magnetic Switch Door Sensor from Gikfun
 - Raspberry Pi 3 running Raspian (debian based distribution)
-- Computer (running windows)
+- Computer - to inform user when door opens. Any OS
 - Resistors
 - Wires
 - Breadboard (for circuit)
