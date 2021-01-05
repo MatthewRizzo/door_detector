@@ -10,6 +10,7 @@ from threading import Thread
 
 # Add subdirs to project path
 sys.path.append("network/")
+sys.path.append("web_app/")
 
 # project includes
 from network.handshake import Handshake
@@ -41,31 +42,32 @@ if __name__ == "__main__":
 
     notif = Notification()
 
-    handshake = Handshake(args)
-    handshake.perform_handshake()
+    ## COMMENTED OUT TO FOCUS ON WEB APP
+    # handshake = Handshake(args)
+    # handshake.perform_handshake()
 
-    # Startup the server
-    server = Server(client_data)
-    server.start()
+    # # Startup the server
+    # server = Server(client_data)
+    # server.start()
 
-    # Constantly wait for a msg that the door has been opened from the board
-    while True and program_ended is False:
-        data = server.wait_for_board(client_data)
-        if data is not None:
-            # Alert user whenever it gets a msg
-            notif.alert()
+    # # Constantly wait for a msg that the door has been opened from the board
+    # while True and program_ended is False:
+    #     data = server.wait_for_board(client_data)
+    #     if data is not None:
+    #         # Alert user whenever it gets a msg
+    #         notif.alert()
 
-            # once the alert is clicked, reset the server run
-            server = None
-            server = Server(client_data)
-            server.start()
+    #         # once the alert is clicked, reset the server run
+    #         server = None
+    #         server = Server(client_data)
+    #         server.start()
 
 
-    # Kill the server thread
-    if server is not None:
-        server.stop_thread()
-        server.join()
-        print("Done with join for server")
-        server = None
+    # # Kill the server thread
+    # if server is not None:
+    #     server.stop_thread()
+    #     server.join()
+    #     print("Done with join for server")
+    #     server = None
 
     sys.exit(1)

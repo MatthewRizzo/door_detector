@@ -23,6 +23,10 @@ class Parser():
         self.parser.add_argument("-p", "--server_run_port", type=int, default=constants.DEFAULT_RUN_PORT,
                                 help="Use this to set the port the client (board) will send notifications to")
 
+        web_app_args = self.parser.add_argument_group(title="Web App Args",
+                    description="Arguments related to the Web App")
+        web_app_args.add_argument('-d', '--debug_app', default=False, action='store_true',
+                                help="Use this flag to put the web app into debug mode and see more details regarding REST Endpoint requests / routes")
     def parse(self):
         self.args = self.parser.parse_args()
 
