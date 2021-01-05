@@ -4,6 +4,8 @@ Project to detect opening of a door using Raspberry Pi, magnetic strip sensor, a
 
 ## User Guide / Setup
 
+**Note:** The install of the Server is primarily tested for Linux or WSL, not Windows.
+
 ### **Building / Running on the board (Client)**
 
 1. Perform the following command (does a fresh setup / install for building):
@@ -26,8 +28,10 @@ This binary will manage:
 **Note: the board's client program must be up and runnning before starting the Server**
 
 1. Navigate to the `server/` dir
-2. Run the following command to start up the server
-`python main.py`
+2. To setup for running the server please run the following command
+`sudo ./install/install.sh`
+
+3. To start up the server program execute the following: `python main.py`
 
 ## **Portions of Code**
 
