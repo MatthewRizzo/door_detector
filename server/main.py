@@ -61,9 +61,7 @@ if __name__ == "__main__":
     while True and program_ended is False:
         data = server.wait_for_board(client_data)
         if data is not None:
-            # Alert user whenever it gets a msg
-            # notif.alert()
-
+            # Alert user whenever it gets a msg by starting the app
             # app will shut itself down once alert is clicked
             app.start_app()
 
