@@ -18,7 +18,6 @@ sys.path.append("web_app/")
 from web_app.app_manager import AppManager
 from network.handshake import Handshake
 from network.server import Server
-from notification import Notification
 from cli_parser import Parser
 
 program_ended = False
@@ -51,8 +50,6 @@ if __name__ == "__main__":
     # Will store data, addr after recvfrom
     client_data = Queue()
 
-    # notif = Notification()
-
     handshake = Handshake(args)
     handshake.perform_handshake()
 
@@ -67,9 +64,8 @@ if __name__ == "__main__":
             # Alert user whenever it gets a msg
             # notif.alert()
 
-
+            # app will shut itself down once alert is clicked
             app.start_app()
-            print("Shutdown of Web App complete\n")
 
             # once the alert is clicked, reset the server run
             server = None

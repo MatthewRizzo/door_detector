@@ -95,12 +95,14 @@ class AppManager():
     def _create_end_routes(self):
         @self.app.route(self.sites["shutdown"], methods=['POST'])
         def shutdown_wrapper():
-            print("Got a request to shutdown app")
-            print("Starting shutdown of Web Server")
+            print("\n------------------------")
+            print("Starting shutdown of Web Application")
             func = request.environ.get('werkzeug.server.shutdown')
             if func is None:
                 raise RuntimeError('Not running with the Werkzeug Server')
             func()
+            print("Shutdown of Web Application Complete")
+            print("\n------------------------")
             return 'Server shutting down...'
 
     def _setup_app_config(self):
