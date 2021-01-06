@@ -3,33 +3,44 @@
 2) spawning a popup / notification that the door has been opened
 """
 # standard includes
+import atexit
 from queue import Queue
 import signal
 import sys
 from threading import Thread
+import time
 
 # Add subdirs to project path
 sys.path.append("network/")
+sys.path.append("web_app/")
 
 # project includes
+from web_app.app_manager import AppManager
 from network.handshake import Handshake
 from network.server import Server
-from notification import Notification
 from cli_parser import Parser
 
 program_ended = False
 
+
 def signal_handler(sig, frame):
+    """Wraps all exit handling related to networked classes/threads
+    """
     print("Caught ctrl+c: ")
     global program_ended
     program_ended = True
     Handshake.set_got_reponse()
     Server.set_got_msg()
+    AppManager.kill_app()
+
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     parser = Parser()
     args = parser.args
+
+    # Takes a long time so do this ASAP
+    app = AppManager(args.debug_app, args.web_app_port)
 
     # Set values obtained from parser (where applicable)
     Server.set_run_port(args.server_run_port)
@@ -38,8 +49,6 @@ if __name__ == "__main__":
 
     # Will store data, addr after recvfrom
     client_data = Queue()
-
-    notif = Notification()
 
     handshake = Handshake(args)
     handshake.perform_handshake()
@@ -53,7 +62,10 @@ if __name__ == "__main__":
         data = server.wait_for_board(client_data)
         if data is not None:
             # Alert user whenever it gets a msg
-            notif.alert()
+            # notif.alert()
+
+            # app will shut itself down once alert is clicked
+            app.start_app()
 
             # once the alert is clicked, reset the server run
             server = None
