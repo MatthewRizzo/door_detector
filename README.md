@@ -31,7 +31,9 @@ This binary will manage:
 2. To setup for running the server please run the following command
 `sudo ./install/install.sh`
 
-3. To start up the server program execute the following: `python main.py`
+3. To start up the server program execute the following: `./run_server.sh [main.py flags and options]`
+The script automatically pipes flags given to it or options set via command line to the python main.
+The purpose of the script is to force the program to be run by the virtual environment (and avoid your having to type in a long file path to python).
 
 ## **Portions of Code**
 
@@ -48,9 +50,11 @@ This binary will manage:
 
 3. Laptop Code - server side (python)
     - When program is running, waits for reciept of a packet from the client.
-    - On reciept, triggers a basic popup or notification on laptop that door has been opened
-    - **Currently, must be run on Windows for graphical aspect of tkinter**
-        - TODO: next branch / implementation will move from tkinter to web apps, so it can run agnostic to OS... basically moving to Linux or WSL
+    - On reciept, triggers a notifcation of the door opening:
+      - A Web App is stared (using Flask framework).
+      - A browser tab is opened which very clearly states the door has opened.
+      - The "Acknowledge Notification" button must be clicked for normal operations of the door detector to restart.
+      - Clicking the button also kills the web app.
 
 **Note:** All client-side code will be written in a completely seperate directory than server-side.
 This is because the client-side code will need to be compiled and run without interaction from server-side.
@@ -59,7 +63,13 @@ Folder structure
   - board/
     - src/
   - server/
-    - python files
+    - python src and subdirs
+    - frontend/
+      - static/
+        - css/
+        - images/
+        - js/
+      - templates/
 
 ## Experimental Setup
 
