@@ -56,7 +56,8 @@ class AppManager():
         else:
             self._log = logging.getLogger('werkzeug')
             self._log.setLevel(logging.INFO)
-            print(f"Homepage Page: {homepage_url}")
+
+        print(f"Starting Web App Notification at this link: {homepage_url}")
 
         webbrowser.open(homepage_url)
 
@@ -86,7 +87,7 @@ class AppManager():
     def _create_mainpage_routes(self):
         @self.app.route(self.sites["mainpage"])
         def mainpage():
-            return render_template("index.html", start_val=25)
+            return render_template("index.html")
 
         @self.app.route(self.sites["icon"])
         def favicon():
