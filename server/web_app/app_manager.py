@@ -102,7 +102,7 @@ class AppManager():
                 raise RuntimeError('Not running with the Werkzeug Server')
             func()
             print("Shutdown of Web Application Complete")
-            print("\n------------------------")
+            print("------------------------\n")
             return 'Server shutting down...'
 
     def _setup_app_config(self):
