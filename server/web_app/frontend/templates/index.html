@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <title>
+        Door Monitor
+    </title>
+    <!-- <link rel = "icon" type="image/png" src="../static/images/ajar_door.jpg" type="image/x-icon"> -->
+
+    <!-- CSS Includes -->
+    <!-- <link rel="stylesheet" type="text/css" href="../static/css/general.css"> -->
+
+    <!-- Javascript Includes (in alphabetical order)-->
+    <script src="../static/js/jquery-3.5.1.min.js"></script>
+    <script type="module" src="../static/js/server-messages.js"></script>
+    <script type="module" src="../static/js/shutdown.js"></script>
+    <script src="../static/js/socket-io-1.4.5.min.js"></script>
+    <script type="module" src="../static/js/utils.js"></script>
+
+<body>
+    <p> Door has been opened</p><br>
+    <button id="shutdown-button">End App </button>
+
+    <div id="after-shutdown-msg" style="display: none;">
+        <p>
+            App has been shutdown. This page can be safetly closed.
+        </p>
+    </div>
+</body>
+</html>

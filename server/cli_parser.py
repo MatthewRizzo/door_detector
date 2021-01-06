@@ -1,6 +1,9 @@
 import argparse
-
 import constants
+import sys
+
+# project imports
+from web_app import app_constants
 
 class Parser():
     """Class responsible for parsing command line args and exposing them to main class when requested."""
@@ -9,7 +12,7 @@ class Parser():
         self._parser = None
 
         self.create_args()
-        self.parse()
+        self._parse()
 
     def create_args(self):
         """Util function to create the args to parse for"""
@@ -26,8 +29,10 @@ class Parser():
         web_app_args = self.parser.add_argument_group(title="Web App Args",
                     description="Arguments related to the Web App")
         web_app_args.add_argument('-d', '--debug_app', default=False, action='store_true',
-                                help="Use this flag to put the web app into debug mode and see more details regarding REST Endpoint requests / routes")
-    def parse(self):
+                                help="Use this flag to put the web app into debug mode (default is to have production mode)")
+        web_app_args.add_argument('-wp', '--web_app_port', type=int, default=app_constants.WEB_APP_PORT)
+
+    def _parse(self):
         self.args = self.parser.parse_args()
 
     @property
