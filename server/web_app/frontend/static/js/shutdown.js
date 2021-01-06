@@ -17,20 +17,7 @@ $(document).ready(() => {
 function perform_shutdown()
 {
     console.log("Shutdown requested")
-    // post_request("/shutdown", {});
-    const url = "/shutdown";
-    $.post({
-        url: url,
-        data: JSON.stringify({}),
-        contentType: 'application/json',
-
-        success: function(){},
-        error: function(request, status, error){
-            console.log("Failed post request for url " + url);
-            console.log("Error " + error);
-            console.log("Status " + status);
-        }
-    });
+    post_request("/shutdown", {});
     document.getElementById('after-shutdown-msg').style.display = "block";
     // window.close();
 }
