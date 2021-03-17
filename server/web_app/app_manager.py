@@ -20,15 +20,19 @@ class AppManager():
     """Class responsible for setting up the Flask app and managing all the routes / sockets.
     Start the app by calling start_app()"""
     _socketio = None
-    def __init__(self, debug: bool, port: int):
+    _is_silent = False
+    def __init__(self, debug: bool, port: int, is_silent=False):
         """
         :param debug: - If true, puts flask into debug mode
         :param port: The port the web app runs on the server
+        :param is_silent Defaults to False. If set to true, all print's will be suppressed
         """
+        AppManager._is_silent = is_silent
         self._is_window_open = False
         self._debug = debug
         self._app_port = port
         self._hostname, self._ip = NetworkUtils.get_cur_hostname_IP().values()
+
 
         self.sites = app_constants.SITE_PATHS
         self._setup_app_config()
@@ -39,16 +43,21 @@ class AppManager():
         # Setup App Routes
         self._create_routes()
 
+        # Done with setup. Inform user of anything they need
+        self._update_homepage_url()
+        print(f"The webapp can be accessed at {self._homepage_url}")
+
     @classmethod
     def kill_app(cls):
         """Asks the front end to send a shutdown request to shutdown the server"""
         # msg triggers a shutdown request from the Frontend
-        print("Shutting down Web App")
+        if not cls._is_silent:
+            print("Shutting down Web App")
         cls._send_to_client("shutdown", {})
 
     def start_app(self):
         """API function to actually start the App up"""
-        homepage_url = self._get_site_url(self._ip, self.sites["mainpage"], self._app_port)
+        self._update_homepage_url()
 
         if self._debug is False:
             self._log = logging.getLogger('werkzeug')
@@ -56,10 +65,10 @@ class AppManager():
         else:
             self._log = logging.getLogger('werkzeug')
             self._log.setLevel(logging.INFO)
+        if not AppManager._is_silent:
+            print(f"Starting Web App Notification at this link: {self._homepage_url}")
 
-        print(f"Starting Web App Notification at this link: {homepage_url}")
-
-        webbrowser.open(homepage_url)
+        webbrowser.open(self._homepage_url)
 
         # run the app
         self._is_window_open = True
@@ -96,14 +105,16 @@ class AppManager():
     def _create_end_routes(self):
         @self.app.route(self.sites["shutdown"], methods=['POST'])
         def shutdown_wrapper():
-            print("\n------------------------")
-            print("Starting shutdown of Web Application")
+            if not AppManager._is_silent:
+                print("\n------------------------")
+                print("Starting shutdown of Web Application")
             func = request.environ.get('werkzeug.server.shutdown')
             if func is None:
                 raise RuntimeError('Not running with the Werkzeug Server')
             func()
-            print("Shutdown of Web Application Complete")
-            print("------------------------\n")
+            if not AppManager._is_silent:
+                print("Shutdown of Web Application Complete")
+                print("------------------------\n")
             return 'Server shutting down...'
 
     def _setup_app_config(self):
@@ -141,3 +152,6 @@ class AppManager():
             cls._socketio.emit(message_name, content_json)
         else:
             cls._socketio.emit(message_name)
+
+    def _update_homepage_url(self):
+        self._homepage_url = self._get_site_url(self._ip, self.sites["mainpage"], self._app_port)

@@ -19,11 +19,15 @@ class Server(Thread):
     """
     received_msg = False
     _run_port =  50001
-    def __init__(self, data_queue: Queue):
+    def __init__(self, data_queue: Queue, is_silent=False):
+        """
+        :param is_silent Defaults to False. If set to true, all print's will be suppressed
+        """
         # Threading related defines
         Thread.__init__(self)
         self.thread_status = threading.Event() # True when thread not running
         Server.received_msg = False
+        self._is_silent = is_silent
 
         self._data_queue = data_queue
 
@@ -35,7 +39,8 @@ class Server(Thread):
         if Server.received_msg is True:
             if not client_data.empty():
                 socket_response_dict = client_data.get(block=False)
-                print(Server.translate_socket_dict(socket_response_dict))
+                if not self._is_silent:
+                    print(Server.translate_socket_dict(socket_response_dict))
                 self.clear_queue(client_data)
             self.stop_thread()
 
@@ -54,7 +59,8 @@ class Server(Thread):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.settimeout(constants.SOCKET_TIMEOUT_SEC)
         sock.bind((udp_ip, self._run_port))
-        print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._run_port}. hostname = {hostname}")
+        if not self._is_silent:
+            print(f"Server is waiting for ping from board/client on IP {udp_ip} and port {self._run_port}. hostname = {hostname}")
 
         # Wait for a ping from board
         while not self.thread_status.is_set() and Server.received_msg is False:

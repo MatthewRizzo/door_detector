@@ -40,7 +40,7 @@ if __name__ == "__main__":
     args = parser.args
 
     # Takes a long time so do this ASAP
-    app = AppManager(args.debug_app, args.web_app_port)
+    app = AppManager(args.debug_app, args.web_app_port, args.silent)
 
     # Set values obtained from parser (where applicable)
     Server.set_run_port(args.server_run_port)
@@ -50,11 +50,11 @@ if __name__ == "__main__":
     # Will store data, addr after recvfrom
     client_data = Queue()
 
-    handshake = Handshake(args)
+    handshake = Handshake(args, args.silent)
     handshake.perform_handshake()
 
     # Startup the server
-    server = Server(client_data)
+    server = Server(client_data, args.silent)
     server.start()
 
     # Constantly wait for a msg that the door has been opened from the board

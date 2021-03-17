@@ -18,11 +18,13 @@ class Handshake(Thread):
         establish communications with the client / board
     """
     got_handshake_response = False
-    def __init__(self, args):
+    def __init__(self, args, is_silent = False):
         """
         :param args: The result of parsing CLI
+        :param is_silent Defaults to False. If set to true, all print's will be suppressed
         """
         self._args = args
+        self._is_silent = is_silent
 
     def perform_handshake(self):
         # Setup the board by giving the port and ip on this machine (server) to send messages to
@@ -43,7 +45,7 @@ class Handshake(Thread):
         setup_thread.join()
         confirm_thread.join()
 
-        print("Communcation Protocal Established\n------------------------\n\n")
+        print("Communication Protocol Established\n------------------------\n\n")
 
     @classmethod
     def send_handshake(cls, client_hostname, board_handshake_recv_port, server_run_port):

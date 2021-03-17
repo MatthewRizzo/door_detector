@@ -32,6 +32,10 @@ class Parser():
                                 help="Use this flag to put the web app into debug mode (default is to have production mode)")
         web_app_args.add_argument('-wp', '--web_app_port', type=int, default=app_constants.WEB_APP_PORT)
 
+        # args for utility
+        self.parser.add_argument("-s", "--silent", default=False, action='store_true',
+                                help="Use this flag to have the server run silent. The only print that occurs is the url the webpage will be hosted on")
+
     def _parse(self):
         self.args = self.parser.parse_args()
 
