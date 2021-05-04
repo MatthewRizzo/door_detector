@@ -14,8 +14,8 @@ $(document).ready(() => {
     create_socket_listener("shutdown", perform_shutdown);
     create_socket_listener("block", start_block);
 
-    const end_block = document.getElementById("end-block-button");
-    end_block.addEventListener('click', end_block)
+    const shutdown_button = document.getElementById("end-block-button");
+    shutdown_button.addEventListener('click', end_block)
 })
 
 /**
@@ -34,14 +34,13 @@ function perform_shutdown()
  */
 async function check_block_status()
 {
-    // const is_blocked = await async_get_request("/info/block_status")["block_status"];
     const is_blocked_raw = await async_get_request("/info/block_status");
     const is_blocked = is_blocked_raw.block_status;
 
     // display the "this page can be closed" msg if the backend is blocking for it
     const display_status = is_blocked == true ? "none" : "display";
 
-    document.getElementById('after-shutdown-msg').style.display = display_status;
+    document.getElementById('after-block-msg').style.display = display_status;
     return is_blocked;
 }
 
@@ -51,7 +50,7 @@ async function check_block_status()
  */
 function start_block()
 {
-    document.getElementById('after-shutdown-msg').style.display = "none";
+    document.getElementById('after-block-msg').style.display = "none";
 }
 
 /**
@@ -60,5 +59,5 @@ function start_block()
 function end_block()
 {
     post_request("/end_block", {})
-    document.getElementById('after-shutdown-msg').style.display = "block";
+    document.getElementById('after-block-msg').style.display = "block";
 }
