@@ -14,8 +14,8 @@ $(document).ready(() => {
     create_socket_listener("shutdown", perform_shutdown);
     create_socket_listener("block", start_block);
 
-    const end_block = document.getElementById("end-block-button");
-    end_block.addEventListener('click', end_block)
+    const shutdown_button = document.getElementById("shutdown-button");
+    shutdown_button.addEventListener('click', end_block)
 })
 
 /**
@@ -25,7 +25,8 @@ function perform_shutdown()
 {
     console.log("Shutdown requested")
     post_request("/shutdown", {});
-    document.getElementById('after-block-msg').style.display = "block";
+    document.getElementById('after-shutdown-msg').style.display = "block";
+    // window.close();
 }
 
 
