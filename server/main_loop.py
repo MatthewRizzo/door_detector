@@ -26,8 +26,7 @@ class MainLoop(Thread):
         # Constantly wait for a msg that the door has been opened from the board
         while True and self._program_ended is False:
             if is_blocked_func() is True:
-                # Make sure the frontends know they need to show blocking info
-                # _send_block_to_frontend_func()
+                print("main loop thinks it's blocked")
                 continue
             data = wait_for_board_func(client_data_queue)
             if data is not None:

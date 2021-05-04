@@ -141,6 +141,7 @@ class AppManager(MainLoop):
         return self._log
 
     def is_blocked(self):
+        
         return self._block
 
     def set_block_status(self, is_blocked : bool):
@@ -180,6 +181,7 @@ class AppManager(MainLoop):
         @self.app.route(self.sites["end_block"], methods=["POST"])
         def end_block():
             self.set_block_status(False)
+            print(f"block status set to {self.is_blocked()}")
             return "ACK"
 
     def _create_status_routes(self):
