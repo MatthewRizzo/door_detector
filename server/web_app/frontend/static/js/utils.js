@@ -4,7 +4,7 @@
  */
 
 /**
- * 
+ *
  * @param {JSON} data_json The Json of data to send to the backend. Will be stringified by this function
  * @param {string} url the url to perform the post request for
  */
@@ -13,7 +13,7 @@ export function post_request(url, data_json){
         url: url,
         data: JSON.stringify(data_json),
         contentType: 'application/json',
-        
+
         success: function(){},
         error: function(request, status, error){
             console.log("Failed post request for url " + url);
@@ -28,7 +28,7 @@ export function post_request(url, data_json){
  * @param {string} url Url to post request for
  * @param {JSON} data_json Data to send in post request
  */
-export async function async_post_request(url, data_json) { 
+export async function async_post_request(url, data_json) {
     let response = null;
     try{
         response = await $.post({
@@ -46,6 +46,27 @@ export async function async_post_request(url, data_json) {
     return response
 }
 
+
+/**
+ * @brief Utility function to abstract away repetition of async get requests
+ * @param {string} url Url to post request for
+ */
+export async function async_get_request(url) {
+    let response = null;
+    try{
+        response = await $.get({
+            url: url,
+            contentType: 'application/json',
+
+        });
+    }catch (error){
+        console.log("Failed get request for url " + url);
+        console.log(JSON.stringify(error));
+        response = 'ERROR';
+    }
+
+    return response
+}
 
 /**
  * @return The root url of the appilcation (i.e. localhost:5000/)

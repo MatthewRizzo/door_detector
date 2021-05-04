@@ -39,9 +39,6 @@ if __name__ == "__main__":
     parser = Parser()
     args = parser.args
 
-    # Takes a long time so do this ASAP
-    app = AppManager(args.debug_app, args.web_app_port, args.silent)
-
     # Set values obtained from parser (where applicable)
     Server.set_run_port(args.server_run_port)
 
@@ -57,25 +54,8 @@ if __name__ == "__main__":
     server = Server(client_data, args.silent)
     server.start()
 
-    # Constantly wait for a msg that the door has been opened from the board
-    while True and program_ended is False:
-        data = server.wait_for_board(client_data)
-        if data is not None:
-            # Alert user whenever it gets a msg by starting the app
-            # app will shut itself down once alert is clicked
-            app.start_app()
+    # Takes a long time so do this ASAP
+    app = AppManager(args.debug_app, args.web_app_port, args.silent, server, client_data)
 
-            # once the alert is clicked, reset the server run
-            server = None
-            server = Server(client_data)
-            server.start()
-
-
-    # Kill the server thread
-    if server is not None:
-        server.stop_thread()
-        server.join()
-        print("Done with join for server")
-        server = None
-
-    sys.exit(1)
+    # Will handle the getting of data from the board and opening the webpage when needed
+    app.start_app()
